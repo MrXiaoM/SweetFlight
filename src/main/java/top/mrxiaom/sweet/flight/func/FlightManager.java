@@ -39,6 +39,10 @@ public class FlightManager extends AbstractModule implements Listener {
         plugin.getScheduler().runTaskTimer(this::everySecond, 20L, 20L);
     }
 
+    public PlayerData get(Player player) {
+        return players.get(player.getUniqueId());
+    }
+
     @Override
     public void reloadConfig(MemoryConfiguration config) {
         String timeStr = config.getString("reset-time", "4:00:00");
@@ -187,11 +191,7 @@ public class FlightManager extends AbstractModule implements Listener {
     private void updateBossBar(PlayerData data) {
         int current = data.status + data.extra;
         double progress = Math.min(1.0, (double) current / data.status);
-        int hour = current / 3600, minute = current / 60 % 60, second = current % 60;
-        String format =
-                (hour > 0 ? String.format(hour > 1 ? formatHours : formatHour, hour) : "") +
-                (minute > 0 || hour > 0 ? String.format(minute > 1 ? formatMinutes : formatMinute, minute) : "") +
-                String.format(second > 1 ? formatSeconds : formatSecond, second);
+        String format = formatTime(current);
         String title = bossBarFlying.replace("%format%", format);
         BossBar bar;
         if (data.bossBar == null) {
@@ -203,5 +203,16 @@ public class FlightManager extends AbstractModule implements Listener {
             bar.setTitle(title);
             bar.setProgress(progress);
         }
+    }
+
+    public String formatTime(int seconds) {
+        int hour = seconds / 3600, minute = seconds / 60 % 60, second = seconds % 60;
+        return (hour > 0 ? String.format(hour > 1 ? formatHours : formatHour, hour) : "") +
+                (minute > 0 || hour > 0 ? String.format(minute > 1 ? formatMinutes : formatMinute, minute) : "") +
+                String.format(second > 1 ? formatSeconds : formatSecond, second);
+    }
+
+    public static FlightManager inst() {
+        return instanceOf(FlightManager.class);
     }
 }
