@@ -1,0 +1,16 @@
+# 添加该选项时，转跳到相应文件
+# goto: '/path/to/groups.yml'
+
+# 飞行组配置，拥有权限 sweet.flight.group.<组名> 代表玩家在该组内
+# 玩家拥有多个权限时，优先级数值越小的组，越优先匹配
+groups:
+  # 默认组，可以往下复制添加更多的组
+  default:
+    # 优先级，不要重复
+    priority: 1000
+    # 每日可飞行时间，单位可用 h（小时）m（分钟）s（秒）
+    # infinite 为无限
+    time: 5m
+  vip:
+    priority: 999
+    time: 1h
