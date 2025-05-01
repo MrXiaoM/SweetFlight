@@ -8,3 +8,14 @@ online-mode: auto
 
 # 飞行时间每日重置时间
 reset-time: '4:00'
+
+time-format:
+  hour: '%d时'
+  hours: '%d时'
+  minute: '%d分'
+  minutes: '%d分'
+  second: '%d秒'
+  seconds: '%d秒'
+
+boss-bar:
+  flying: '&f剩余飞行时间: &e%format%'

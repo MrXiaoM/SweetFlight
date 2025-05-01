@@ -1,0 +1,201 @@
+package top.mrxiaom.sweet.flight.func;
+
+import org.bukkit.Bukkit;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
+import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
+import top.mrxiaom.pluginbase.func.AutoRegister;
+import top.mrxiaom.sweet.flight.SweetFlight;
+import top.mrxiaom.sweet.flight.database.FlightDatabase;
+import top.mrxiaom.sweet.flight.func.entry.Group;
+import top.mrxiaom.sweet.flight.func.entry.PlayerData;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+@AutoRegister
+public class FlightManager extends AbstractModule implements Listener {
+    private LocalTime resetTime;
+    private Map<UUID, PlayerData> players = new HashMap<>();
+    private String bossBarFlying;
+    private String formatHour, formatHours, formatMinute, formatMinutes, formatSecond, formatSeconds;
+    public FlightManager(SweetFlight plugin) {
+        super(plugin);
+        registerEvents();
+        plugin.getScheduler().runTaskTimer(this::everySecond, 20L, 20L);
+    }
+
+    @Override
+    public void reloadConfig(MemoryConfiguration config) {
+        String timeStr = config.getString("reset-time", "4:00:00");
+        String[] split = timeStr.split(":", 3);
+        LocalTime resetTime = null;
+        try {
+            if (split.length == 3) {
+                int hour = Integer.parseInt(split[0]);
+                int minute = Integer.parseInt(split[1]);
+                int second = Integer.parseInt(split[2]);
+                resetTime = LocalTime.of(hour, minute, second);
+            } else if (split.length == 2) {
+                int hour = Integer.parseInt(split[0]);
+                int minute = Integer.parseInt(split[1]);
+                resetTime = LocalTime.of(hour, minute);
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        this.resetTime = resetTime;
+        this.bossBarFlying = config.getString("boss-bar.flying", "");
+        this.formatHour = config.getString("time-format.hour", "%d时");
+        this.formatHours = config.getString("time-format.hours", "%d时");
+        this.formatMinutes = config.getString("time-format.minute", "%d分");
+        this.formatMinutes = config.getString("time-format.minutes", "%d分");
+        this.formatSecond = config.getString("time-format.second", "%d秒");
+        this.formatSeconds = config.getString("time-format.seconds", "%d秒");
+    }
+
+    public LocalDateTime nextOutdate() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate date;
+        LocalTime time = now.toLocalTime();
+        if (time.isAfter(resetTime)) {
+            return now.toLocalDate().plusDays(1).atTime(resetTime);
+        } else {
+            return now.toLocalDate().atTime(resetTime);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        Player player = e.getPlayer();
+        Group group = GroupManager.inst().getGroup(player);
+        UUID uuid = player.getUniqueId();
+        String id = plugin.key(player);
+        int status, extra;
+        LocalDateTime nextOutdate = nextOutdate();
+        try (Connection conn = plugin.getConnection()) {
+            FlightDatabase db = plugin.getFlightDatabase();
+            Integer statusRaw = db.getPlayerStatus(conn, id);
+            status = statusRaw == null ? group.getTimeSecond() : statusRaw;
+            extra = db.getPlayerExtra(conn, id);
+            players.put(uuid, new PlayerData(player, status, extra, nextOutdate));
+        } catch (SQLException ex) {
+            warn(ex);
+            status = extra = 0;
+        }
+        if (!player.hasPermission("sweet.flight.bypass")) {
+            if (group.getTimeSecond() == -1) {
+                player.setAllowFlight(true);
+            } else {
+                if (extra == 0 && status == 0) {
+                    t(player, "&e飞行时间已耗尽");
+                    player.setFlying(false);
+                    player.setAllowFlight(false);
+                } else {
+                    player.setAllowFlight(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        PlayerData data = players.remove(e.getPlayer().getUniqueId());
+        if (data != null) {
+            if (data.bossBar != null) {
+                data.bossBar.removeAll();
+                data.bossBar = null;
+            }
+            FlightDatabase db = plugin.getFlightDatabase();
+            db.setPlayer(data.player, data.status, data.extra, data.outdate);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
+        if (!e.isFlying()) return;
+        Player player = e.getPlayer();
+        if (player.hasPermission("sweet.flight.bypass")) return;
+        PlayerData data = players.get(player.getUniqueId());
+        if (data == null) {
+            t(player, "&c数据异常，请联系服务器管理员");
+            e.setCancelled(true);
+            return;
+        }
+        if (data.status == 0 && data.extra == 0) {
+            t(player, "&e飞行时间已耗尽");
+            player.setFlying(false);
+            player.setAllowFlight(false);
+            e.setCancelled(true);
+        }
+    }
+
+    private void everySecond() {
+        FlightDatabase db = plugin.getFlightDatabase();
+        GroupManager groups = GroupManager.inst();
+        LocalDateTime now = LocalDateTime.now();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Group group = groups.getGroup(player);
+            PlayerData data = players.get(player.getUniqueId());
+            if (data == null) continue;
+            if (now.isAfter(data.outdate)) {
+                data.outdate = nextOutdate();
+                data.status = Math.max(0, group.getTimeSecond());
+                db.setPlayerStatus(player, data.status, data.outdate);
+            } else {
+                if (player.isFlying()) {
+                    boolean update = true;
+                    if (data.extra > 0) data.extra--;
+                    else if (data.status > 0) data.status--;
+                    else {
+                        update = false;
+                        t(player, "&e飞行时间已耗尽");
+                        player.setFlying(false);
+                        player.setAllowFlight(false);
+                        data.bossBar.removeAll();
+                        data.bossBar = null;
+                    }
+                    if (update) updateBossBar(data);
+                }
+                if (--data.saveCounter == 0) {
+                    data.saveCounter = 60;
+                    db.setPlayerStatus(player, data.status, data.outdate);
+                }
+            }
+        }
+    }
+
+    private void updateBossBar(PlayerData data) {
+        int current = data.status + data.extra;
+        double progress = Math.min(1.0, (double) current / data.status);
+        int hour = current / 3600, minute = current / 60 % 60, second = current % 60;
+        String format =
+                (hour > 0 ? String.format(hour > 1 ? formatHours : formatHour, hour) : "") +
+                (minute > 0 || hour > 0 ? String.format(minute > 1 ? formatMinutes : formatMinute, minute) : "") +
+                String.format(second > 1 ? formatSeconds : formatSecond, second);
+        String title = bossBarFlying.replace("%format%", format);
+        BossBar bar;
+        if (data.bossBar == null) {
+            data.bossBar = Bukkit.createBossBar(title, BarColor.BLUE, BarStyle.SEGMENTED_10);
+            data.bossBar.setProgress(progress);
+            data.bossBar.addPlayer(data.player);
+        } else {
+            bar = data.bossBar;
+            bar.setTitle(title);
+            bar.setProgress(progress);
+        }
+    }
+}

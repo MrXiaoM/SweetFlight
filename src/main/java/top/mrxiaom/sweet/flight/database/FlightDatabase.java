@@ -39,11 +39,18 @@ public class FlightDatabase extends AbstractPluginHolder implements IDatabase {
     }
 
     public Integer getPlayerStatus(Player player) {
-        try (Connection conn = plugin.getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                     "SELECT * FROM `" + STATUS_TABLE_NAME + "` WHERE `player`=?;"
-             )) {
-            ps.setString(1, plugin.key(player));
+        try (Connection conn = plugin.getConnection()) {
+            return getPlayerStatus(conn, plugin.key(player));
+        } catch (SQLException e) {
+            warn(e);
+        }
+        return null;
+    }
+    public Integer getPlayerStatus(Connection conn, String id) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT * FROM `" + STATUS_TABLE_NAME + "` WHERE `player`=?;"
+        )) {
+            ps.setString(1, id);
             try (ResultSet resultSet = ps.executeQuery()) {
                 if (resultSet.next()) {
                     Timestamp now = Timestamp.valueOf(LocalDateTime.now());
@@ -54,73 +61,87 @@ public class FlightDatabase extends AbstractPluginHolder implements IDatabase {
                     return resultSet.getInt("seconds");
                 }
             }
-        } catch (SQLException e) {
-            warn(e);
         }
         return null;
     }
-
     public void setPlayerStatus(Player player, int value, LocalDateTime nextOutdate) {
         try (Connection conn = plugin.getConnection()) {
-            String sentence;
-            boolean mysql = plugin.options.database().isMySQL();
-            if (mysql) {
-                sentence = "INSERT INTO `" + STATUS_TABLE_NAME + "`(`player`,`seconds`,`outdate`) VALUES(?, ?, ?) on duplicate key update `seconds`=?, `outdate`=?;";
-            } else {
-                sentence = "INSERT OR REPLACE INTO `" + STATUS_TABLE_NAME + "`(`player`,`seconds`,`outdate`) VALUES(?, ?, ?);";
-            }
-            try (PreparedStatement ps = conn.prepareStatement(sentence)) {
-                String id = plugin.key(player);
-                Timestamp outdate = Timestamp.valueOf(nextOutdate);
-                ps.setString(1, id);
-                ps.setInt(2, value);
-                ps.setTimestamp(3, outdate);
-                if (mysql) {
-                    ps.setInt(4, value);
-                    ps.setTimestamp(5, outdate);
-                }
-                ps.execute();
-            }
+            setPlayerStatus(conn, plugin.key(player), value, nextOutdate);
         } catch (SQLException e) {
             warn(e);
+        }
+    }
+    private void setPlayerStatus(Connection conn, String id, int value, LocalDateTime nextOutdate) throws SQLException {
+        String sentence;
+        boolean mysql = plugin.options.database().isMySQL();
+        if (mysql) {
+            sentence = "INSERT INTO `" + STATUS_TABLE_NAME + "`(`player`,`seconds`,`outdate`) VALUES(?, ?, ?) on duplicate key update `seconds`=?, `outdate`=?;";
+        } else {
+            sentence = "INSERT OR REPLACE INTO `" + STATUS_TABLE_NAME + "`(`player`,`seconds`,`outdate`) VALUES(?, ?, ?);";
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sentence)) {
+            Timestamp outdate = Timestamp.valueOf(nextOutdate);
+            ps.setString(1, id);
+            ps.setInt(2, value);
+            ps.setTimestamp(3, outdate);
+            if (mysql) {
+                ps.setInt(4, value);
+                ps.setTimestamp(5, outdate);
+            }
+            ps.execute();
         }
     }
 
     public int getPlayerExtra(Player player) {
-        try (Connection conn = plugin.getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                     "SELECT * FROM `" + EXTRA_TABLE_NAME + "` WHERE `player`=?;"
-             )) {
-            ps.setString(1, plugin.key(player));
-            try (ResultSet resultSet = ps.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getInt("seconds");
-                }
-            }
+        try (Connection conn = plugin.getConnection()) {
+            return getPlayerExtra(conn, plugin.key(player));
         } catch (SQLException e) {
             warn(e);
         }
         return 0;
     }
-
+    public int getPlayerExtra(Connection conn, String id) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT * FROM `" + EXTRA_TABLE_NAME + "` WHERE `player`=?;"
+        )) {
+            ps.setString(1, id);
+            try (ResultSet resultSet = ps.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("seconds");
+                }
+            }
+        }
+        return 0;
+    }
     public void setPlayerExtra(Player player, int value) {
         try (Connection conn = plugin.getConnection()) {
-            String sentence;
-            boolean mysql = plugin.options.database().isMySQL();
+            setPlayerExtra(conn, plugin.key(player), value);
+        } catch (SQLException e) {
+            warn(e);
+        }
+    }
+    private void setPlayerExtra(Connection conn, String id, int value) throws SQLException {
+        String sentence;
+        boolean mysql = plugin.options.database().isMySQL();
+        if (mysql) {
+            sentence = "INSERT INTO `" + EXTRA_TABLE_NAME + "`(`player`,`seconds`) VALUES(?, ?) on duplicate key update `seconds`=?;";
+        } else {
+            sentence = "INSERT OR REPLACE INTO `" + EXTRA_TABLE_NAME + "`(`player`,`seconds`) VALUES(?, ?);";
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sentence)) {
+            ps.setString(1, id);
+            ps.setInt(2, value);
             if (mysql) {
-                sentence = "INSERT INTO `" + EXTRA_TABLE_NAME + "`(`player`,`seconds`) VALUES(?, ?) on duplicate key update `seconds`=?;";
-            } else {
-                sentence = "INSERT OR REPLACE INTO `" + EXTRA_TABLE_NAME + "`(`player`,`seconds`) VALUES(?, ?);";
+                ps.setInt(3, value);
             }
-            try (PreparedStatement ps = conn.prepareStatement(sentence)) {
-                String id = plugin.key(player);
-                ps.setString(1, id);
-                ps.setInt(2, value);
-                if (mysql) {
-                    ps.setInt(3, value);
-                }
-                ps.execute();
-            }
+            ps.execute();
+        }
+    }
+    public void setPlayer(Player player, int status, int extra, LocalDateTime nextOutdate) {
+        try (Connection conn = plugin.getConnection()) {
+            String id = plugin.key(player);
+            setPlayerStatus(conn, id, status, nextOutdate);
+            setPlayerExtra(conn, id, extra);
         } catch (SQLException e) {
             warn(e);
         }
