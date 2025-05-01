@@ -23,9 +23,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @AutoRegister
 public class FlightManager extends AbstractModule implements Listener {
@@ -33,8 +31,10 @@ public class FlightManager extends AbstractModule implements Listener {
     private Map<UUID, PlayerData> players = new HashMap<>();
     private String bossBarFlying;
     private String formatHour, formatHours, formatMinute, formatMinutes, formatSecond, formatSeconds;
+    private List<Player> toLoad = new ArrayList<>();
     public FlightManager(SweetFlight plugin) {
         super(plugin);
+        toLoad.addAll(Bukkit.getOnlinePlayers());
         registerEvents();
         plugin.getScheduler().runTaskTimer(this::everySecond, 20L, 20L);
     }
@@ -65,6 +65,10 @@ public class FlightManager extends AbstractModule implements Listener {
         this.formatMinutes = config.getString("time-format.minutes", "%d分");
         this.formatSecond = config.getString("time-format.second", "%d秒");
         this.formatSeconds = config.getString("time-format.seconds", "%d秒");
+        for (Player player : toLoad) {
+            onJoin(player);
+        }
+        toLoad.clear();
     }
 
     public LocalDateTime nextOutdate() {
@@ -81,6 +85,8 @@ public class FlightManager extends AbstractModule implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
+    }
+    public void onJoin(Player player) {
         Group group = GroupManager.inst().getGroup(player);
         UUID uuid = player.getUniqueId();
         String id = plugin.key(player);
