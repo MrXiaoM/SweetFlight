@@ -25,6 +25,11 @@ public class GroupManager extends AbstractModule implements Listener {
     }
 
     @Override
+    public int priority() {
+        return 999;
+    }
+
+    @Override
     public void reloadConfig(MemoryConfiguration config) {
         File file = plugin.resolve("./groups.yml");
         if (!file.exists()) {
@@ -45,12 +50,12 @@ public class GroupManager extends AbstractModule implements Listener {
         ConfigurationSection section = config.getConfigurationSection("groups");
         if (section != null) for (String key : section.getKeys(false)) {
             int priority = section.getInt(key + ".priority", 1000);
-            long timeSecond = 0;
+            int timeSecond = 0;
             String str = section.getString(key + ".time", "");
             if (str.equals("infinite")) {
                 timeSecond = -1;
             } else {
-                Long parsed = parseTime(str);
+                Integer parsed = parseTime(str);
                 if (parsed == null) {
                     warn("[groups/" + key + "] 输入的时间格式不正确");
                     continue;
@@ -82,8 +87,8 @@ public class GroupManager extends AbstractModule implements Listener {
         return instanceOf(GroupManager.class);
     }
 
-    public static Long parseTime(String str) {
-        Long parsed = 0L;
+    public static Integer parseTime(String str) {
+        Integer parsed = 0;
         String numberBuffer = "";
         for (char c : str.toCharArray()) {
             if (c == '0' || c == '1' || c == '2'
