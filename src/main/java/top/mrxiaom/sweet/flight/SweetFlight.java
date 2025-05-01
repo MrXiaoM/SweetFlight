@@ -1,6 +1,7 @@
 package top.mrxiaom.sweet.flight;
         
 import top.mrxiaom.pluginbase.BukkitPlugin;
+import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 
 public class SweetFlight extends BukkitPlugin {
     public static SweetFlight getInstance() {
@@ -15,7 +16,7 @@ public class SweetFlight extends BukkitPlugin {
                 .reconnectDatabaseWhenReloadConfig(false)
                 .scanIgnore("top.mrxiaom.sweet.flight.libs")
         );
-        // this.scheduler = new FoliaLibScheduler(this);
+        this.scheduler = new FoliaLibScheduler(this);
     }
 
     @Override
