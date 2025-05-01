@@ -1,3 +1,10 @@
 
+# 在线模式
+# true - 使用UUID识别玩家
+# false - 使用玩家名识别玩家
+# auto - 根据服务器当前是否开启在线模式，来确定是 true 还是 false
+# 在正式投入使用该插件之后不应该修改这个值
+online-mode: auto
+
 # 飞行时间每日重置时间
 reset-time: '4:00'
