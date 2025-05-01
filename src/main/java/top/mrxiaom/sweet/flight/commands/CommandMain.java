@@ -74,10 +74,10 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (args.length == 2 && "database".equalsIgnoreCase(args[1])) {
                 plugin.options.database().reloadConfig();
                 plugin.options.database().reconnect();
-                return Messages.command__reload__config.tm(sender);
+                return Messages.command__reload__database.tm(sender);
             }
             plugin.reloadConfig();
-            return Messages.command__reload__database.tm(sender);
+            return Messages.command__reload__config.tm(sender);
         }
         return true;
     }

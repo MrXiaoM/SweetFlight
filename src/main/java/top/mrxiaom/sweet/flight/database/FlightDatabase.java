@@ -23,7 +23,7 @@ public class FlightDatabase extends AbstractPluginHolder implements IDatabase {
                 "CREATE TABLE if NOT EXISTS `" + STATUS_TABLE_NAME + "`(" +
                         "`player` varchar(48) PRIMARY KEY," +
                         "`seconds` int," +
-                        "`outdate` timestamp," +
+                        "`outdate` timestamp" +
                         ");"
         )) {
             ps.execute();
