@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import top.mrxiaom.pluginbase.BukkitPlugin;
+import top.mrxiaom.pluginbase.func.LanguageManager;
 import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 import top.mrxiaom.sweet.flight.database.FlightDatabase;
 
@@ -37,6 +38,9 @@ public class SweetFlight extends BukkitPlugin {
         options.registerDatabase(
                 flightDatabase = new FlightDatabase(this)
         );
+        LanguageManager.inst()
+                .setLangFile("messages.yml")
+                .register(Messages.class, Messages::holder);
     }
 
     @Override
