@@ -1,0 +1,11 @@
+name: SweetFlight
+version: '${version}'
+main: top.mrxiaom.sweet.flight.SweetFlight
+api-version: 1.13
+softdepend:
+  - PlaceholderAPI
+authors: [ MrXiaoM ]
+commands:
+  sweetflight:
+    description: 'The main command of SweetFlight'
+    aliases: [ sweetfly, sflight, sfly, sf ]
