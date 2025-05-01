@@ -10,7 +10,9 @@ import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.AutoRegister;
+import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.flight.Messages;
 import top.mrxiaom.sweet.flight.SweetFlight;
 import top.mrxiaom.sweet.flight.func.AbstractModule;
 import top.mrxiaom.sweet.flight.func.FlightManager;
@@ -30,47 +32,52 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         if (args.length == 3 && "set".equalsIgnoreCase(args[0]) && sender.isOp()) {
             Player player = Util.getOnlinePlayer(args[1]).orElse(null);
             if (player == null) {
-                return t(sender, "&e玩家不存在 (或不在线)");
+                return Messages.player__not_online.tm(sender);
             }
             FlightManager manager = FlightManager.inst();
             PlayerData data = manager.get(player);
             if (data == null) {
-                return t(sender, "&e玩家数据异常");
+                return Messages.player__data_not_found.tm(sender);
             }
             int value = Util.parseInt(args[2]).orElse(-1);
             if (value < 0) {
-                return t(sender, "&e请输入大于等于0的整数");
+                return Messages.command__set__not_integer.tm(sender);
             }
             data.extra = value;
             plugin.getFlightDatabase().setPlayerExtra(player, data.extra);
-            return t(sender, "&a已设置玩家&e " + player.getName() + " &a的额外飞行时间为&e " + manager.formatTime(value));
+            return Messages.command__set__success.tm(sender,
+                    Pair.of("%player%", player.getName()),
+                    Pair.of("%time%", manager.formatTime(data.extra)));
         }
         if (args.length == 3 && "add".equalsIgnoreCase(args[0]) && sender.isOp()) {
             Player player = Util.getOnlinePlayer(args[1]).orElse(null);
             if (player == null) {
-                return t(sender, "&e玩家不存在 (或不在线)");
+                return Messages.player__not_online.tm(sender);
             }
             FlightManager manager = FlightManager.inst();
             PlayerData data = manager.get(player);
             if (data == null) {
-                return t(sender, "&e玩家数据异常");
+                return Messages.player__data_not_found.tm(sender);
             }
             int value = Util.parseInt(args[2]).orElse(0);
             if (value <= 0) {
-                return t(sender, "&e请输入大于0的整数");
+                return Messages.command__add__not_integer.tm(sender);
             }
             data.extra += value;
             plugin.getFlightDatabase().setPlayerExtra(player, data.extra);
-            return t(sender, "&a已为玩家&e " + player.getName() + " &a增加&e " + manager.formatTime(value) + " &a的额外飞行时间，增加后为&e " + manager.formatTime(data.extra));
+            return Messages.command__add__success.tm(sender,
+                    Pair.of("%player%", player.getName()),
+                    Pair.of("%added%", manager.formatTime(value)),
+                    Pair.of("%time%", manager.formatTime(data.extra)));
         }
         if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]) && sender.isOp()) {
             if (args.length == 2 && "database".equalsIgnoreCase(args[1])) {
                 plugin.options.database().reloadConfig();
                 plugin.options.database().reconnect();
-                return t(sender, "&a已重新连接数据库");
+                return Messages.command__reload__config.tm(sender);
             }
             plugin.reloadConfig();
-            return t(sender, "&a配置文件已重载");
+            return Messages.command__reload__database.tm(sender);
         }
         return true;
     }

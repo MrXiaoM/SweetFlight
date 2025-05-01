@@ -8,7 +8,18 @@ import java.util.List;
 import static top.mrxiaom.pluginbase.func.language.LanguageEnumAutoHolder.wrap;
 
 public enum Messages implements IHolderAccessor {
-
+    player__not_online("&e玩家不在线 &7(或不存在)"),
+    player__data_not_found("&e玩家数据异常"),
+    player__data_invalid_start("&c数据异常，请联系服务器管理员"),
+    command__set__not_integer("&e请输入大于等于0的整数"),
+    command__set__success("&a已设置玩家&e %player% &a的额外飞行时间为&e %time%"),
+    command__add__not_integer("&e请输入大于0的整数"),
+    command__add__success("&a已为玩家&e %player% &a增加&e %added% 的额外飞行时间，增加后为&e %time%"),
+    command__reload__config("&a配置文件已重载"),
+    command__reload__database("&a已重新连接数据库"),
+    time_not_enough__join("&e飞行时间已耗尽"),
+    time_not_enough__start("&e飞行时间已耗尽"),
+    time_not_enough__timer("&e飞行时间已耗尽"),
     ;
     Messages(String defaultValue) {
         holder = wrap(this, defaultValue);

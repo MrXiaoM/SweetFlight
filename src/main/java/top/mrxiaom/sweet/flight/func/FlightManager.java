@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import top.mrxiaom.pluginbase.func.AutoRegister;
+import top.mrxiaom.sweet.flight.Messages;
 import top.mrxiaom.sweet.flight.SweetFlight;
 import top.mrxiaom.sweet.flight.database.FlightDatabase;
 import top.mrxiaom.sweet.flight.func.entry.Group;
@@ -111,7 +112,7 @@ public class FlightManager extends AbstractModule implements Listener {
                 player.setAllowFlight(true);
             } else {
                 if (extra == 0 && status == 0) {
-                    t(player, "&e飞行时间已耗尽");
+                    Messages.time_not_enough__join.tm(player);
                     player.setFlying(false);
                     player.setAllowFlight(false);
                 } else {
@@ -141,12 +142,12 @@ public class FlightManager extends AbstractModule implements Listener {
         if (player.hasPermission("sweet.flight.bypass")) return;
         PlayerData data = players.get(player.getUniqueId());
         if (data == null) {
-            t(player, "&c数据异常，请联系服务器管理员");
+            Messages.player__data_invalid_start.tm(player);
             e.setCancelled(true);
             return;
         }
         if (data.status == 0 && data.extra == 0) {
-            t(player, "&e飞行时间已耗尽");
+            Messages.time_not_enough__start.tm(player);
             player.setFlying(false);
             player.setAllowFlight(false);
             e.setCancelled(true);
@@ -172,7 +173,7 @@ public class FlightManager extends AbstractModule implements Listener {
                     else if (data.status > 0) data.status--;
                     else {
                         update = false;
-                        t(player, "&e飞行时间已耗尽");
+                        Messages.time_not_enough__timer.tm(player);
                         player.setFlying(false);
                         player.setAllowFlight(false);
                         data.bossBar.removeAll();
