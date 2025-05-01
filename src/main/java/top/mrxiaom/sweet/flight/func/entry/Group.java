@@ -3,9 +3,9 @@ package top.mrxiaom.sweet.flight.func.entry;
 public class Group {
     private final int priority;
     private final String name;
-    private final long timeSecond;
+    private final int timeSecond;
 
-    public Group(int priority, String name, long timeSecond) {
+    public Group(int priority, String name, int timeSecond) {
         this.priority = priority;
         this.name = name;
         this.timeSecond = timeSecond;
@@ -19,7 +19,7 @@ public class Group {
         return name;
     }
 
-    public long getTimeSecond() {
+    public int getTimeSecond() {
         return timeSecond;
     }
 }
