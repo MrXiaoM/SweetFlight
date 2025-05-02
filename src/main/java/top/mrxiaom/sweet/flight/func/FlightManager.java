@@ -119,7 +119,9 @@ public class FlightManager extends AbstractModule implements Listener {
                 player.setAllowFlight(true);
             } else {
                 if (extra == 0 && status == 0) {
-                    Messages.time_not_enough__join.tm(player);
+                    if (group.getTimeSecond() > 0) {
+                        Messages.time_not_enough__join.tm(player);
+                    }
                     player.setFlying(false);
                     player.setAllowFlight(false);
                 } else {
