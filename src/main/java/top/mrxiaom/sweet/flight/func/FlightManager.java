@@ -99,7 +99,7 @@ public class FlightManager extends AbstractModule implements Listener {
         plugin.getScheduler().runTask(() -> onJoin(player));
     }
     public void onJoin(Player player) {
-        Group group = GroupManager.inst().getGroup(player);
+        int standard = GroupManager.inst().getFlightSeconds(player);
         UUID uuid = player.getUniqueId();
         String id = plugin.key(player);
         int status, extra;
@@ -107,7 +107,7 @@ public class FlightManager extends AbstractModule implements Listener {
         try (Connection conn = plugin.getConnection()) {
             FlightDatabase db = plugin.getFlightDatabase();
             Integer statusRaw = db.getPlayerStatus(conn, id);
-            status = statusRaw == null ? group.getTimeSecond() : statusRaw;
+            status = statusRaw == null ? standard : statusRaw;
             extra = db.getPlayerExtra(conn, id);
             players.put(uuid, new PlayerData(player, status, extra, nextOutdate));
         } catch (SQLException ex) {
@@ -115,11 +115,11 @@ public class FlightManager extends AbstractModule implements Listener {
             status = extra = 0;
         }
         if (!player.hasPermission("sweet.flight.bypass")) {
-            if (group.getTimeSecond() == -1) {
+            if (standard == -1) {
                 player.setAllowFlight(true);
             } else {
                 if (extra == 0 && status == 0) {
-                    if (group.getTimeSecond() > 0) {
+                    if (standard > 0) {
                         Messages.time_not_enough__join.tm(player);
                     }
                     player.setFlying(false);
@@ -169,8 +169,8 @@ public class FlightManager extends AbstractModule implements Listener {
             player.setAllowFlight(false);
             e.setCancelled(true);
         } else {
-            Group group = GroupManager.inst().getGroup(player);
-            updateBossBar(data, group);
+            int standard = GroupManager.inst().getFlightSeconds(player);
+            updateBossBar(data, standard);
         }
     }
 
@@ -179,18 +179,17 @@ public class FlightManager extends AbstractModule implements Listener {
         GroupManager groups = GroupManager.inst();
         LocalDateTime now = LocalDateTime.now();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Group group = groups.getGroup(player);
-            int status = group.getTimeSecond();
+            int standard = groups.getFlightSeconds(player);
             PlayerData data = players.get(player.getUniqueId());
             if (data == null) continue;
             if (now.isAfter(data.outdate)) {
                 data.outdate = nextOutdate();
-                data.status = Math.max(0, status);
+                data.status = Math.max(0, standard);
                 db.setPlayerStatus(player, data.status, data.outdate);
             } else {
                 if (player.isFlying()) {
                     boolean update = true;
-                    if (status >= 0) {
+                    if (standard >= 0) {
                         if (data.extra > 0) data.extra--;
                         else if (data.status > 0) data.status--;
                         else {
@@ -202,7 +201,7 @@ public class FlightManager extends AbstractModule implements Listener {
                             data.bossBar = null;
                         }
                     }
-                    if (update) updateBossBar(data, group);
+                    if (update) updateBossBar(data, standard);
                 } else {
                     if (data.bossBar != null) {
                         data.bossBar.removeAll();
@@ -217,11 +216,10 @@ public class FlightManager extends AbstractModule implements Listener {
         }
     }
 
-    private void updateBossBar(PlayerData data, Group group) {
+    private void updateBossBar(PlayerData data, int standard) {
         int current = data.status + data.extra;
-        int status = group.getTimeSecond();
-        double progress = status <= 0 ? 1.0 : Math.min(1.0, (double) current / status);
-        String format = status == -1 ? formatInfinite : formatTime(current);
+        double progress = standard <= 0 ? 1.0 : Math.min(1.0, (double) current / standard);
+        String format = standard == -1 ? formatInfinite : formatTime(current);
         String title = ColorHelper.parseColor(bossBarFlying.replace("%format%", format));
         BossBar bar;
         if (data.bossBar == null) {

@@ -13,7 +13,7 @@ groups:
     time: 5m
   vip:
     priority: 999
-    time: 1h
+    time: +1h
   infinite:
     priority: 0
     time: infinite
