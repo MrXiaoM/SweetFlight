@@ -50,6 +50,65 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length >= 1 && "on".equalsIgnoreCase(args[0])) {
+            Player target;
+            if (args.length == 2) {
+                if (!sender.hasPermission("sweet.flight.toggle.other")) {
+                    return Messages.no_permission.tm(sender);
+                }
+                target = Util.getOnlinePlayer(args[1]).orElse(null);
+                if (target == null) {
+                    return Messages.player__not_online.tm(sender);
+                }
+            } else {
+                if (sender instanceof Player) {
+                    target = (Player) sender;
+                } else {
+                    return Messages.player__only.tm(sender);
+                }
+            }
+            FlightManager manager = FlightManager.inst();
+            PlayerData data = manager.get(target);
+            if (data == null) {
+                return Messages.player__data_not_found.tm(sender);
+            }
+            if (data.extra == 0 && data.status == 0) {
+                target.setFlying(false);
+                target.setAllowFlight(false);
+                return Messages.time_not_enough__command.tm(sender);
+            }
+            target.setAllowFlight(true);
+            target.setFlying(true);
+            return Messages.command__on__success.tm(sender);
+        }
+        if (args.length >= 1 && "off".equalsIgnoreCase(args[0])) {
+            Player target;
+            if (args.length == 2) {
+                if (!sender.hasPermission("sweet.flight.toggle.other")) {
+                    return Messages.no_permission.tm(sender);
+                }
+                target = Util.getOnlinePlayer(args[1]).orElse(null);
+                if (target == null) {
+                    return Messages.player__not_online.tm(sender);
+                }
+            } else {
+                if (sender instanceof Player) {
+                    target = (Player) sender;
+                } else {
+                    return Messages.player__only.tm(sender);
+                }
+            }
+            target.setFlying(false);
+            FlightManager manager = FlightManager.inst();
+            PlayerData data = manager.get(target);
+            if (data == null) {
+                return Messages.player__data_not_found.tm(sender);
+            }
+            if (data.extra == 0 && data.status == 0) {
+                target.setAllowFlight(false);
+            }
+            return Messages.command__off__success.tm(sender);
+        }
         if (args.length == 3 && "set".equalsIgnoreCase(args[0]) && sender.isOp()) {
             Player player = Util.getOnlinePlayer(args[1]).orElse(null);
             if (player == null) {
@@ -123,7 +182,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
     }
 
     private static final List<String> emptyList = Lists.newArrayList();
-    private static final List<String> listArg0 = Lists.newArrayList();
+    private static final List<String> listArg0 = Lists.newArrayList(
+            "on", "off");
     private static final List<String> listOpArg0 = Lists.newArrayList(
             "set", "add", "reset", "reload");
     private static final List<String> listArg1Reload = Lists.newArrayList("database");
@@ -136,7 +196,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         if (args.length == 2) {
             if (sender.isOp()) {
                 if ("set".equalsIgnoreCase(args[0]) || "add".equalsIgnoreCase(args[0])
-                        || "reset".equalsIgnoreCase(args[0])) {
+                || "reset".equalsIgnoreCase(args[0])
+                || "on".equalsIgnoreCase(args[0]) || "off".equalsIgnoreCase(args[0])) {
                     return null;
                 }
                 if ("reload".equalsIgnoreCase(args[0])) {

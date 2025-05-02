@@ -9,8 +9,10 @@ import static top.mrxiaom.pluginbase.func.language.LanguageEnumAutoHolder.wrap;
 
 public enum Messages implements IHolderAccessor {
     player__not_online("&e玩家不在线 &7(或不存在)"),
+    player__only("&e这个命令只能由玩家执行"),
     player__data_not_found("&e玩家数据异常"),
     player__data_invalid_start("&c数据异常，请联系服务器管理员"),
+    no_permission("&c你没有执行此操作的权限"),
     command__set__not_time("&e请输入大于等于0秒的时间"),
     command__set__success("&a已设置玩家&e %player% &a的额外飞行时间为&e %time%"),
     command__add__not_time("&e请输入大于0秒的时间"),
@@ -18,9 +20,12 @@ public enum Messages implements IHolderAccessor {
     command__reset__success("&a已重置玩家&e %player% &a的今日飞行时间为&e %time%"),
     command__reload__config("&a配置文件已重载"),
     command__reload__database("&a已重新连接数据库"),
+    command__on__success("&f飞行已&a开启"),
+    command__off__success("&f飞行已&e关闭"),
     time_not_enough__join("&e飞行时间已耗尽"),
     time_not_enough__start("&e飞行时间已耗尽"),
     time_not_enough__timer("&e飞行时间已耗尽"),
+    time_not_enough__command("&e飞行时间已耗尽"),
     ;
     Messages(String defaultValue) {
         holder = wrap(this, defaultValue);
