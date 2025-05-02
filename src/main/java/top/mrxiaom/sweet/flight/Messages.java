@@ -26,6 +26,17 @@ public enum Messages implements IHolderAccessor {
     time_not_enough__start("&e飞行时间已耗尽"),
     time_not_enough__timer("&e飞行时间已耗尽"),
     time_not_enough__command("&e飞行时间已耗尽"),
+
+    help__normal("&9&lSweetFlight &e&l帮助命令&r",
+            "&f/sf on &7开启飞行",
+            "&f/sf off &7关闭飞行"),
+    help__admin("&9&lSweetFlight &e&l帮助命令&r",
+            "&f/sf on [玩家] &7开启飞行",
+            "&f/sf off [玩家] &7关闭飞行",
+            "&f/sf reset <玩家> &7重置玩家今日的基础飞行时间",
+            "&f/sf set <玩家> <时间> &7设置玩家的额外飞行时间",
+            "&f/sf add <玩家> <时间> &7为玩家增加额外飞行时间"),
+
     ;
     Messages(String defaultValue) {
         holder = wrap(this, defaultValue);
