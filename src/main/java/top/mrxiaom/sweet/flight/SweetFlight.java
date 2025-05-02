@@ -5,6 +5,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.func.LanguageManager;
+import top.mrxiaom.pluginbase.utils.PAPI;
 import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 import top.mrxiaom.sweet.flight.database.FlightDatabase;
 
@@ -62,6 +63,9 @@ public class SweetFlight extends BukkitPlugin {
 
     @Override
     protected void afterEnable() {
+        if (PAPI.isEnabled()) {
+            new Placeholders(this).register();
+        }
         getLogger().info("SweetFlight 加载完毕");
     }
 
