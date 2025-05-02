@@ -79,15 +79,6 @@ public class GroupManager extends AbstractModule implements Listener {
         }
     }
 
-    public Group getGroup(Permissible p) {
-        for (Group group : groups) {
-            if (p.hasPermission("sweet.flight.group." + group.getName())) {
-                return group;
-            }
-        }
-        return defaultGroup;
-    }
-
     public int getFlightSeconds(Permissible p) {
         int seconds = 0;
         List<Group> list = new ArrayList<>();

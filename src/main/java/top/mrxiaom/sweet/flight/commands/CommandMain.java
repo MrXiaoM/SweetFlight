@@ -31,9 +31,9 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     private void postSetFlightTime(PlayerData data) {
         Player player = data.player;
-        Group group = GroupManager.inst().getGroup(player);
+        int standard = GroupManager.inst().getFlightSeconds(player);
         if (!player.hasPermission("sweet.flight.bypass")) {
-            if (group.getTimeSecond() == -1) {
+            if (standard == -1) {
                 player.setAllowFlight(true);
             } else {
                 if (data.extra == 0 && data.status == 0) {
@@ -160,8 +160,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             FlightManager manager = FlightManager.inst();
             GroupManager groups = GroupManager.inst();
             PlayerData data = manager.getOrCreate(player);
-            Group group = groups.getGroup(player);
-            data.status = Math.max(0, group.getTimeSecond());
+            int standard = groups.getFlightSeconds(player);
+            data.status = Math.max(0, standard);
             data.outdate = manager.nextOutdate();
             plugin.getFlightDatabase().setPlayer(data);
             postSetFlightTime(data);
