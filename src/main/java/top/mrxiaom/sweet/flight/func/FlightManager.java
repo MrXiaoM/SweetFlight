@@ -90,6 +90,7 @@ public class FlightManager extends AbstractModule implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
+        plugin.getScheduler().runTask(() -> onJoin(player));
     }
     public void onJoin(Player player) {
         Group group = GroupManager.inst().getGroup(player);
@@ -119,6 +120,8 @@ public class FlightManager extends AbstractModule implements Listener {
                     player.setAllowFlight(true);
                 }
             }
+        } else {
+            player.setAllowFlight(true);
         }
     }
 
@@ -180,6 +183,11 @@ public class FlightManager extends AbstractModule implements Listener {
                         data.bossBar = null;
                     }
                     if (update) updateBossBar(data);
+                } else {
+                    if (data.bossBar != null) {
+                        data.bossBar.removeAll();
+                        data.bossBar = null;
+                    }
                 }
                 if (--data.saveCounter == 0) {
                     data.saveCounter = 60;
