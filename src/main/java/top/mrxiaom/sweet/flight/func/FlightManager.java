@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import top.mrxiaom.pluginbase.func.AutoRegister;
+import top.mrxiaom.pluginbase.utils.ColorHelper;
 import top.mrxiaom.sweet.flight.Messages;
 import top.mrxiaom.sweet.flight.SweetFlight;
 import top.mrxiaom.sweet.flight.database.FlightDatabase;
@@ -140,10 +141,16 @@ public class FlightManager extends AbstractModule implements Listener {
 
     @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
-        if (!e.isFlying()) return;
         Player player = e.getPlayer();
-        if (player.hasPermission("sweet.flight.bypass")) return;
         PlayerData data = players.get(player.getUniqueId());
+        if (!e.isFlying()) {
+            if (data != null && data.bossBar != null) {
+                data.bossBar.removeAll();
+                data.bossBar = null;
+            }
+            return;
+        }
+        if (player.hasPermission("sweet.flight.bypass")) return;
         if (data == null) {
             Messages.player__data_invalid_start.tm(player);
             e.setCancelled(true);
@@ -154,6 +161,8 @@ public class FlightManager extends AbstractModule implements Listener {
             player.setFlying(false);
             player.setAllowFlight(false);
             e.setCancelled(true);
+        } else {
+            updateBossBar(data);
         }
     }
 
@@ -201,7 +210,7 @@ public class FlightManager extends AbstractModule implements Listener {
         int current = data.status + data.extra;
         double progress = Math.min(1.0, (double) current / data.status);
         String format = formatTime(current);
-        String title = bossBarFlying.replace("%format%", format);
+        String title = ColorHelper.parseColor(bossBarFlying.replace("%format%", format));
         BossBar bar;
         if (data.bossBar == null) {
             data.bossBar = Bukkit.createBossBar(title, BarColor.BLUE, BarStyle.SEGMENTED_10);
