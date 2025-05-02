@@ -16,6 +16,8 @@ import top.mrxiaom.sweet.flight.Messages;
 import top.mrxiaom.sweet.flight.SweetFlight;
 import top.mrxiaom.sweet.flight.func.AbstractModule;
 import top.mrxiaom.sweet.flight.func.FlightManager;
+import top.mrxiaom.sweet.flight.func.GroupManager;
+import top.mrxiaom.sweet.flight.func.entry.Group;
 import top.mrxiaom.sweet.flight.func.entry.PlayerData;
 
 import java.util.*;
@@ -25,6 +27,25 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
     public CommandMain(SweetFlight plugin) {
         super(plugin);
         registerCommand("sweetflight", this);
+    }
+
+    private void postSetExtraFlightTime(PlayerData data) {
+        Player player = data.player;
+        Group group = GroupManager.inst().getGroup(player);
+        if (!player.hasPermission("sweet.flight.bypass")) {
+            if (group.getTimeSecond() == -1) {
+                player.setAllowFlight(true);
+            } else {
+                if (data.extra == 0 && data.status == 0) {
+                    player.setFlying(false);
+                    player.setAllowFlight(false);
+                } else {
+                    player.setAllowFlight(true);
+                }
+            }
+        } else {
+            player.setAllowFlight(true);
+        }
     }
 
     @Override
@@ -45,6 +66,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             }
             data.extra = value;
             plugin.getFlightDatabase().setPlayerExtra(player, data.extra);
+            postSetExtraFlightTime(data);
             return Messages.command__set__success.tm(sender,
                     Pair.of("%player%", player.getName()),
                     Pair.of("%time%", manager.formatTime(data.extra)));
@@ -65,6 +87,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             }
             data.extra += value;
             plugin.getFlightDatabase().setPlayerExtra(player, data.extra);
+            postSetExtraFlightTime(data);
             return Messages.command__add__success.tm(sender,
                     Pair.of("%player%", player.getName()),
                     Pair.of("%added%", manager.formatTime(value)),
