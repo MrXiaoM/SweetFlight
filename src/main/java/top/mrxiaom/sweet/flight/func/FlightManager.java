@@ -163,7 +163,8 @@ public class FlightManager extends AbstractModule implements Listener {
             player.setAllowFlight(false);
             e.setCancelled(true);
         } else {
-            updateBossBar(data);
+            Group group = GroupManager.inst().getGroup(player);
+            updateBossBar(data, group);
         }
     }
 
@@ -195,7 +196,7 @@ public class FlightManager extends AbstractModule implements Listener {
                             data.bossBar = null;
                         }
                     }
-                    if (update) updateBossBar(data);
+                    if (update) updateBossBar(data, group);
                 } else {
                     if (data.bossBar != null) {
                         data.bossBar.removeAll();
@@ -210,8 +211,7 @@ public class FlightManager extends AbstractModule implements Listener {
         }
     }
 
-    private void updateBossBar(PlayerData data) {
-        Group group = GroupManager.inst().getGroup(data.player);
+    private void updateBossBar(PlayerData data, Group group) {
         int current = data.status + data.extra;
         int status = group.getTimeSecond();
         double progress = status <= 0 ? 1.0 : Math.min(1.0, (double) current / status);
