@@ -149,6 +149,7 @@ public class FlightManager extends AbstractModule implements Listener {
     @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
         Player player = e.getPlayer();
+        int standard = GroupManager.inst().getFlightSeconds(player);
         PlayerData data = players.get(player.getUniqueId());
         if (!e.isFlying()) {
             if (data != null && data.bossBar != null) {
@@ -157,21 +158,23 @@ public class FlightManager extends AbstractModule implements Listener {
             }
             return;
         }
-        if (player.hasPermission("sweet.flight.bypass")) return;
-        if (data == null) {
-            Messages.player__data_invalid_start.tm(player);
-            e.setCancelled(true);
-            return;
+        if (standard > 0) {
+            if (!player.hasPermission("sweet.flight.bypass")) {
+                if (data == null) {
+                    Messages.player__data_invalid_start.tm(player);
+                    e.setCancelled(true);
+                    return;
+                }
+                if (data.status == 0 && data.extra == 0) {
+                    Messages.time_not_enough__start.tm(player);
+                    player.setFlying(false);
+                    player.setAllowFlight(false);
+                    e.setCancelled(true);
+                    return;
+                }
+            }
         }
-        if (data.status == 0 && data.extra == 0) {
-            Messages.time_not_enough__start.tm(player);
-            player.setFlying(false);
-            player.setAllowFlight(false);
-            e.setCancelled(true);
-        } else {
-            int standard = GroupManager.inst().getFlightSeconds(player);
-            updateBossBar(data, standard);
-        }
+        updateBossBar(data, standard);
     }
 
     private void everySecond() {

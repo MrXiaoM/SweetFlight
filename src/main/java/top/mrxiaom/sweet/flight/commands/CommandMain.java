@@ -68,14 +68,17 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 }
             }
             FlightManager manager = FlightManager.inst();
-            PlayerData data = manager.get(target);
-            if (data == null) {
-                return Messages.player__data_not_found.tm(sender);
-            }
-            if (data.extra == 0 && data.status == 0) {
-                target.setFlying(false);
-                target.setAllowFlight(false);
-                return Messages.time_not_enough__command.tm(sender);
+            int standard = GroupManager.inst().getFlightSeconds(target);
+            if (standard >= 0) {
+                PlayerData data = manager.get(target);
+                if (data == null) {
+                    return Messages.player__data_not_found.tm(sender);
+                }
+                if (data.extra == 0 && data.status == 0) {
+                    target.setFlying(false);
+                    target.setAllowFlight(false);
+                    return Messages.time_not_enough__command.tm(sender);
+                }
             }
             target.setAllowFlight(true);
             target.setFlying(true);
