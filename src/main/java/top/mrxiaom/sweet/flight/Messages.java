@@ -14,7 +14,7 @@ public enum Messages implements IHolderAccessor {
     command__set__not_integer("&e请输入大于等于0的整数"),
     command__set__success("&a已设置玩家&e %player% &a的额外飞行时间为&e %time%"),
     command__add__not_integer("&e请输入大于0的整数"),
-    command__add__success("&a已为玩家&e %player% &a增加&e %added% 的额外飞行时间，增加后为&e %time%"),
+    command__add__success("&a已为玩家&e %player% &a增加&e %added% &a的额外飞行时间，增加后为&e %time%"),
     command__reset__success("&a已重置玩家&e %player% &a的今日飞行时间为&e %time%"),
     command__reload__config("&a配置文件已重载"),
     command__reload__database("&a已重新连接数据库"),
