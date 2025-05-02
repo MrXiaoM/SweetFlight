@@ -125,7 +125,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
     private static final List<String> emptyList = Lists.newArrayList();
     private static final List<String> listArg0 = Lists.newArrayList();
     private static final List<String> listOpArg0 = Lists.newArrayList(
-            "set", "add", "reload");
+            "set", "add", "reset", "reload");
     private static final List<String> listArg1Reload = Lists.newArrayList("database");
     @Nullable
     @Override
@@ -135,7 +135,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         }
         if (args.length == 2) {
             if (sender.isOp()) {
-                if ("set".equalsIgnoreCase(args[0]) || "add".equalsIgnoreCase(args[0])) {
+                if ("set".equalsIgnoreCase(args[0]) || "add".equalsIgnoreCase(args[0])
+                        || "reset".equalsIgnoreCase(args[0])) {
                     return null;
                 }
                 if ("reload".equalsIgnoreCase(args[0])) {
