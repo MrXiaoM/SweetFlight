@@ -60,9 +60,9 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (data == null) {
                 return Messages.player__data_not_found.tm(sender);
             }
-            int value = Util.parseInt(args[2]).orElse(-1);
-            if (value < 0) {
-                return Messages.command__set__not_integer.tm(sender);
+            Integer value = GroupManager.parseTime(args[2]);
+            if (value == null || value < 0) {
+                return Messages.command__set__not_time.tm(sender);
             }
             data.extra = value;
             plugin.getFlightDatabase().setPlayerExtra(player, data.extra);
@@ -81,9 +81,9 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (data == null) {
                 return Messages.player__data_not_found.tm(sender);
             }
-            int value = Util.parseInt(args[2]).orElse(0);
-            if (value <= 0) {
-                return Messages.command__add__not_integer.tm(sender);
+            Integer value = GroupManager.parseTime(args[2]);
+            if (value == null || value <= 0) {
+                return Messages.command__add__not_time.tm(sender);
             }
             data.extra += value;
             plugin.getFlightDatabase().setPlayerExtra(player, data.extra);
