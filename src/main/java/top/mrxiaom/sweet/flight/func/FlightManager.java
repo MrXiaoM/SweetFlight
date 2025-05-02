@@ -67,7 +67,7 @@ public class FlightManager extends AbstractModule implements Listener {
         this.bossBarFlying = config.getString("boss-bar.flying", "");
         this.formatHour = config.getString("time-format.hour", "%d时");
         this.formatHours = config.getString("time-format.hours", "%d时");
-        this.formatMinutes = config.getString("time-format.minute", "%d分");
+        this.formatMinute = config.getString("time-format.minute", "%d分");
         this.formatMinutes = config.getString("time-format.minutes", "%d分");
         this.formatSecond = config.getString("time-format.second", "%d秒");
         this.formatSeconds = config.getString("time-format.seconds", "%d秒");
