@@ -45,6 +45,10 @@ public class FlightManager extends AbstractModule implements Listener {
         return players.get(player.getUniqueId());
     }
 
+    public PlayerData getOrCreate(Player player) {
+        return players.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerData(player, 0, 0, LocalDateTime.now()));
+    }
+
     @Override
     public void reloadConfig(MemoryConfiguration config) {
         String timeStr = config.getString("reset-time", "4:00:00");
@@ -136,7 +140,7 @@ public class FlightManager extends AbstractModule implements Listener {
                 data.bossBar = null;
             }
             FlightDatabase db = plugin.getFlightDatabase();
-            db.setPlayer(data.player, data.status, data.extra, data.outdate);
+            db.setPlayer(data);
         }
     }
 

@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import top.mrxiaom.pluginbase.database.IDatabase;
 import top.mrxiaom.sweet.flight.SweetFlight;
 import top.mrxiaom.sweet.flight.func.AbstractPluginHolder;
+import top.mrxiaom.sweet.flight.func.entry.PlayerData;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -145,5 +146,8 @@ public class FlightDatabase extends AbstractPluginHolder implements IDatabase {
         } catch (SQLException e) {
             warn(e);
         }
+    }
+    public void setPlayer(PlayerData data) {
+        setPlayer(data.player, data.status, data.extra, data.outdate);
     }
 }

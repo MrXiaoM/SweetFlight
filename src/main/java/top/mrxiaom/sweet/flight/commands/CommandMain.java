@@ -29,7 +29,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         registerCommand("sweetflight", this);
     }
 
-    private void postSetExtraFlightTime(PlayerData data) {
+    private void postSetFlightTime(PlayerData data) {
         Player player = data.player;
         Group group = GroupManager.inst().getGroup(player);
         if (!player.hasPermission("sweet.flight.bypass")) {
@@ -66,7 +66,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             }
             data.extra = value;
             plugin.getFlightDatabase().setPlayerExtra(player, data.extra);
-            postSetExtraFlightTime(data);
+            postSetFlightTime(data);
             return Messages.command__set__success.tm(sender,
                     Pair.of("%player%", player.getName()),
                     Pair.of("%time%", manager.formatTime(data.extra)));
@@ -87,11 +87,28 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             }
             data.extra += value;
             plugin.getFlightDatabase().setPlayerExtra(player, data.extra);
-            postSetExtraFlightTime(data);
+            postSetFlightTime(data);
             return Messages.command__add__success.tm(sender,
                     Pair.of("%player%", player.getName()),
                     Pair.of("%added%", manager.formatTime(value)),
                     Pair.of("%time%", manager.formatTime(data.extra)));
+        }
+        if (args.length == 2 && "reset".equalsIgnoreCase(args[0]) && sender.isOp()) {
+            Player player = Util.getOnlinePlayer(args[1]).orElse(null);
+            if (player == null) {
+                return Messages.player__not_online.tm(sender);
+            }
+            FlightManager manager = FlightManager.inst();
+            GroupManager groups = GroupManager.inst();
+            PlayerData data = manager.getOrCreate(player);
+            Group group = groups.getGroup(player);
+            data.status = Math.max(0, group.getTimeSecond());
+            data.outdate = manager.nextOutdate();
+            plugin.getFlightDatabase().setPlayer(data);
+            postSetFlightTime(data);
+            return Messages.command__reset__success.tm(sender,
+                    Pair.of("%player%", player.getName()),
+                    Pair.of("%time%", manager.formatTime(data.status)));
         }
         if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]) && sender.isOp()) {
             if (args.length == 2 && "database".equalsIgnoreCase(args[1])) {
