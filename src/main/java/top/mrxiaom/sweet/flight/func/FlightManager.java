@@ -32,7 +32,7 @@ public class FlightManager extends AbstractModule implements Listener {
     private LocalTime resetTime;
     private Map<UUID, PlayerData> players = new HashMap<>();
     private String bossBarFlying;
-    private String formatHour, formatHours, formatMinute, formatMinutes, formatSecond, formatSeconds;
+    private String formatHour, formatHours, formatMinute, formatMinutes, formatSecond, formatSeconds, formatInfinite;
     private List<Player> toLoad = new ArrayList<>();
     public FlightManager(SweetFlight plugin) {
         super(plugin);
@@ -71,6 +71,7 @@ public class FlightManager extends AbstractModule implements Listener {
         this.formatMinutes = config.getString("time-format.minutes", "%d分");
         this.formatSecond = config.getString("time-format.second", "%d秒");
         this.formatSeconds = config.getString("time-format.seconds", "%d秒");
+        this.formatInfinite = config.getString("time-format.infinite", "无限");
         for (Player player : toLoad) {
             onJoin(player);
         }
@@ -172,24 +173,27 @@ public class FlightManager extends AbstractModule implements Listener {
         LocalDateTime now = LocalDateTime.now();
         for (Player player : Bukkit.getOnlinePlayers()) {
             Group group = groups.getGroup(player);
+            int status = group.getTimeSecond();
             PlayerData data = players.get(player.getUniqueId());
             if (data == null) continue;
             if (now.isAfter(data.outdate)) {
                 data.outdate = nextOutdate();
-                data.status = Math.max(0, group.getTimeSecond());
+                data.status = Math.max(0, status);
                 db.setPlayerStatus(player, data.status, data.outdate);
             } else {
                 if (player.isFlying()) {
                     boolean update = true;
-                    if (data.extra > 0) data.extra--;
-                    else if (data.status > 0) data.status--;
-                    else {
-                        update = false;
-                        Messages.time_not_enough__timer.tm(player);
-                        player.setFlying(false);
-                        player.setAllowFlight(false);
-                        data.bossBar.removeAll();
-                        data.bossBar = null;
+                    if (status >= 0) {
+                        if (data.extra > 0) data.extra--;
+                        else if (data.status > 0) data.status--;
+                        else {
+                            update = false;
+                            Messages.time_not_enough__timer.tm(player);
+                            player.setFlying(false);
+                            player.setAllowFlight(false);
+                            data.bossBar.removeAll();
+                            data.bossBar = null;
+                        }
                     }
                     if (update) updateBossBar(data);
                 } else {
@@ -207,9 +211,11 @@ public class FlightManager extends AbstractModule implements Listener {
     }
 
     private void updateBossBar(PlayerData data) {
+        Group group = GroupManager.inst().getGroup(data.player);
         int current = data.status + data.extra;
-        double progress = Math.min(1.0, (double) current / data.status);
-        String format = formatTime(current);
+        int status = group.getTimeSecond();
+        double progress = status <= 0 ? 1.0 : Math.min(1.0, (double) current / status);
+        String format = status == -1 ? formatInfinite : formatTime(current);
         String title = ColorHelper.parseColor(bossBarFlying.replace("%format%", format));
         BossBar bar;
         if (data.bossBar == null) {

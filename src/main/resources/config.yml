@@ -16,6 +16,7 @@ time-format:
   minutes: '%d分'
   second: '%d秒'
   seconds: '%d秒'
+  infinite: '无限'
 
 boss-bar:
   flying: '&f剩余飞行时间: &e%format%'
