@@ -200,8 +200,10 @@ public class FlightManager extends AbstractModule implements Listener {
                             Messages.time_not_enough__timer.tm(player);
                             player.setFlying(false);
                             player.setAllowFlight(false);
-                            data.bossBar.removeAll();
-                            data.bossBar = null;
+                            if (data.bossBar != null) {
+                                data.bossBar.removeAll();
+                                data.bossBar = null;
+                            }
                         }
                     }
                     if (update) updateBossBar(data, standard);
