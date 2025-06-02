@@ -79,15 +79,24 @@ public class GroupManager extends AbstractModule implements Listener {
         }
     }
 
-    public int getFlightSeconds(Permissible p) {
-        int seconds = 0;
+    /**
+     * 获取玩家的所有飞行组
+     * @return 按优先级倒序排序
+     */
+    public List<Group> getGroups(Permissible p) {
         List<Group> list = new ArrayList<>();
-        for (Group group : groups) {
+        for (Group group : groups) { // 按优先级匹配组
             if (p.hasPermission("sweet.flight.group." + group.getName())) {
                 list.add(group);
             }
         }
-        Collections.reverse(list);
+        Collections.reverse(list); // 反转匹配到的组
+        return list;
+    }
+
+    public int getFlightSeconds(Permissible p) {
+        int seconds = 0;
+        List<Group> list = getGroups(p);
         for (Group group : list) {
             if (group.getMode().equals(Group.Mode.ADD)) {
                 seconds += group.getTimeSecond();
