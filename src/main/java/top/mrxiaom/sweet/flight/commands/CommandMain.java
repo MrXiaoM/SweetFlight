@@ -132,7 +132,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (target.equals(sender)) {
                 Messages.command__check__header_yourself.tm(sender);
             } else {
-                Messages.command__check__header_yourself.tm(sender,
+                Messages.command__check__header_other.tm(sender,
                         Pair.of("%player%", target.getName()));
             }
             FlightManager flight = FlightManager.inst();
