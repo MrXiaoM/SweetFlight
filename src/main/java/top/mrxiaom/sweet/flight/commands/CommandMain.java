@@ -155,7 +155,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 }
                 if (group.getMode().equals(Group.Mode.SET)) {
                     int value = group.getTimeSecond();
-                    if (value > 0) {
+                    if (value >= 0) {
                         Messages.command__check__group_set.tm(sender,
                                 Pair.of("%group%", group.getName()),
                                 Pair.of("%time%", flight.formatTime(value)));
