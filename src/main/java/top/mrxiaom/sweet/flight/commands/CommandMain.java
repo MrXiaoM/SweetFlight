@@ -112,6 +112,68 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             }
             return Messages.command__off__success.tm(sender);
         }
+        if (args.length >= 1 && "check".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.check")) {
+            Player target;
+            if (args.length == 2) {
+                if (!sender.hasPermission("sweet.flight.check.other")) {
+                    return Messages.no_permission.tm(sender);
+                }
+                target = Util.getOnlinePlayer(args[1]).orElse(null);
+                if (target == null) {
+                    return Messages.player__not_online.tm(sender);
+                }
+            } else {
+                if (sender instanceof Player) {
+                    target = (Player) sender;
+                } else {
+                    return Messages.player__only.tm(sender);
+                }
+            }
+            if (target.equals(sender)) {
+                Messages.command__check__header_yourself.tm(sender);
+            } else {
+                Messages.command__check__header_yourself.tm(sender,
+                        Pair.of("%player%", target.getName()));
+            }
+            FlightManager flight = FlightManager.inst();
+            GroupManager manager = GroupManager.inst();
+            PlayerData data = flight.get(target);
+            if (data == null) {
+                return Messages.player__data_not_found.tm(sender);
+            }
+            List<Group> groups = manager.getGroups(target);
+            int standard = 0;
+            int status = data.status;
+            int extra = data.extra;
+            for (Group group : groups) {
+                if (group.getMode().equals(Group.Mode.ADD)) {
+                    int value = group.getTimeSecond();
+                    Messages.command__check__group_add.tm(sender,
+                            Pair.of("%group%", group.getName()),
+                            Pair.of("%time%", flight.formatTime(value)));
+                    standard += value;
+                }
+                if (group.getMode().equals(Group.Mode.SET)) {
+                    int value = group.getTimeSecond();
+                    if (value > 0) {
+                        Messages.command__check__group_set.tm(sender,
+                                Pair.of("%group%", group.getName()),
+                                Pair.of("%time%", flight.formatTime(value)));
+                    }
+                    standard = group.getTimeSecond();
+                }
+                if (standard == -1) {
+                    Messages.command__check__group_infinite.tm(sender,
+                            Pair.of("%group%", group.getName()));
+                    break;
+                }
+            }
+            Messages.command__check__standard.tm(sender, Pair.of("%time%", flight.formatTimeMax(standard)));
+            Messages.command__check__remaining.tm(sender, Pair.of("%time%", flight.formatTime(status + extra)));
+            Messages.command__check__remaining_status.tm(sender, Pair.of("%time%", flight.formatTime(status)));
+            Messages.command__check__remaining_extra.tm(sender, Pair.of("%time%", flight.formatTime(extra)));
+            return true;
+        }
         if (args.length == 3 && "set".equalsIgnoreCase(args[0]) && sender.isOp()) {
             Player player = Util.getOnlinePlayer(args[1]).orElse(null);
             if (player == null) {
@@ -186,9 +248,9 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     private static final List<String> emptyList = Lists.newArrayList();
     private static final List<String> listArg0 = Lists.newArrayList(
-            "on", "off");
+            "on", "off", "check");
     private static final List<String> listOpArg0 = Lists.newArrayList(
-            "set", "add", "reset", "reload");
+            "set", "add", "check", "reset", "reload");
     private static final List<String> listArg1Reload = Lists.newArrayList("database");
     @Nullable
     @Override
@@ -199,7 +261,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         if (args.length == 2) {
             if (sender.isOp()) {
                 if ("set".equalsIgnoreCase(args[0]) || "add".equalsIgnoreCase(args[0])
-                || "reset".equalsIgnoreCase(args[0])
+                || "reset".equalsIgnoreCase(args[0]) || "check".equalsIgnoreCase(args[0])
                 || "on".equalsIgnoreCase(args[0]) || "off".equalsIgnoreCase(args[0])) {
                     return null;
                 }
