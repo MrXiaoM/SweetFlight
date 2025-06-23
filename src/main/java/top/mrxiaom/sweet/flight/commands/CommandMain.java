@@ -247,22 +247,37 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
     }
 
     private static final List<String> emptyList = Lists.newArrayList();
-    private static final List<String> listArg0 = Lists.newArrayList(
-            "on", "off", "check");
-    private static final List<String> listOpArg0 = Lists.newArrayList(
-            "set", "add", "check", "reset", "reload");
     private static final List<String> listArg1Reload = Lists.newArrayList("database");
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            return startsWith(sender.isOp() ? listOpArg0 : listArg0, args[0]);
+            List<String> list = new ArrayList<>();
+            list.add("on");
+            list.add("off");
+            if (sender.hasPermission("sweet.flight.check")) {
+                list.add("check");
+            }
+            if (sender.isOp()) {
+                list.add("set");
+                list.add("add");
+                list.add("reset");
+                list.add("reload");
+            }
+            return startsWith(list, args[0]);
         }
         if (args.length == 2) {
+            if ("check".equalsIgnoreCase(args[0])
+                    && sender.hasPermission("sweet.flight.check")
+                    && sender.hasPermission("sweet.flight.check.other")) {
+                return null;
+            }
+            if (("on".equalsIgnoreCase(args[0]) || "off".equalsIgnoreCase(args[0]))
+                    && sender.hasPermission("sweet.flight.toggle.other")) {
+                return null;
+            }
             if (sender.isOp()) {
-                if ("set".equalsIgnoreCase(args[0]) || "add".equalsIgnoreCase(args[0])
-                || "reset".equalsIgnoreCase(args[0]) || "check".equalsIgnoreCase(args[0])
-                || "on".equalsIgnoreCase(args[0]) || "off".equalsIgnoreCase(args[0])) {
+                if ("set".equalsIgnoreCase(args[0]) || "add".equalsIgnoreCase(args[0]) || "reset".equalsIgnoreCase(args[0])) {
                     return null;
                 }
                 if ("reload".equalsIgnoreCase(args[0])) {
