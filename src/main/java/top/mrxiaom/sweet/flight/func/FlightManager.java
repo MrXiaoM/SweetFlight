@@ -122,6 +122,21 @@ public class FlightManager extends AbstractModule implements Listener {
         return true;
     }
 
+    /**
+     *
+     * 获取玩家在此位置是否可以无限飞行
+     * @param player 玩家
+     * @param loc 目标位置
+     */
+    public boolean canInfiniteFly(@NotNull Player player, @NotNull Location loc) {
+        for (IFlyChecker checker : flyCheckers) {
+            if (checker.canInfiniteFly(player, loc)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
@@ -146,10 +161,15 @@ public class FlightManager extends AbstractModule implements Listener {
             status = extra = 0;
         }
         if (!player.hasPermission("sweet.flight.bypass")) {
-            if (!canPlayerFlyAt(player, player.getLocation())) {
+            Location loc = player.getLocation();
+            // 其它插件不允许玩家在此飞行，关闭玩家的飞行
+            if (!canPlayerFlyAt(player, loc)) {
                 player.setAllowFlight(false);
                 player.setFlying(false);
             } else {
+                if (canInfiniteFly(player, loc)) { // 其它插件允许玩家无限飞行，不进行任何操作
+                    return;
+                }
                 if (standard == -1) { // 无限飞行时间，开启飞行
                     player.setAllowFlight(true);
                 } else {
@@ -201,13 +221,14 @@ public class FlightManager extends AbstractModule implements Listener {
                     e.setCancelled(true);
                     return;
                 }
+                Location loc = e.getPlayer().getLocation();
                 // 如果其它插件不允许玩家飞行，则关闭飞行
-                if (!canPlayerFlyAt(player, e.getPlayer().getLocation())) {
+                if (!canPlayerFlyAt(player, loc)) {
                     e.setCancelled(true);
                     return;
                 }
-                // 如果时间耗尽，提醒玩家并关闭飞行
-                if (data.status == 0 && data.extra == 0) {
+                // 如果时间耗尽，且其它插件没有允许玩家在此无限飞行，提醒玩家并关闭飞行
+                if (data.status == 0 && data.extra == 0 && !canInfiniteFly(player, loc)) {
                     Messages.time_not_enough__start.tm(player);
                     player.setFlying(false);
                     player.setAllowFlight(false);
@@ -236,8 +257,9 @@ public class FlightManager extends AbstractModule implements Listener {
                 // 如果玩家正在飞行
                 if (player.isFlying()) {
                     boolean update = true;
+                    Location loc = player.getLocation();
                     // 如果其它插件禁止玩家飞行
-                    if (!canPlayerFlyAt(player, player.getLocation())) {
+                    if (!canPlayerFlyAt(player, loc)) {
                         update = false;
                         // 关闭飞行，关闭血条
                         player.setFlying(false);
@@ -246,7 +268,8 @@ public class FlightManager extends AbstractModule implements Listener {
                             data.bossBar.removeAll();
                             data.bossBar = null;
                         }
-                    } else if (standard >= 0) { // 如果不是无限飞行时间
+                        // 如果不是无限飞行时间，且其它插件没有允许玩家进行无限飞行
+                    } else if (standard >= 0 && !canInfiniteFly(player, loc)) {
                         // 优先扣除额外飞行时间，额外飞行时间不够再扣除基础飞行时间
                         if (data.extra > 0) data.extra--;
                         else if (data.status > 0) data.status--;
