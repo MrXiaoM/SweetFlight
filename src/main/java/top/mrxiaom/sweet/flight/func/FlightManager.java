@@ -109,7 +109,7 @@ public class FlightManager extends AbstractModule implements Listener {
     }
 
     /**
-     * 获取玩家在此位置是否可以飞行
+     * 【其它插件兼容】获取玩家在此位置是否可以飞行
      * @param player 玩家
      * @param loc 目标位置
      */
@@ -123,8 +123,7 @@ public class FlightManager extends AbstractModule implements Listener {
     }
 
     /**
-     *
-     * 获取玩家在此位置是否可以无限飞行
+     * 【其它插件兼容】获取玩家在此位置是否可以无限飞行
      * @param player 玩家
      * @param loc 目标位置
      */
