@@ -23,6 +23,7 @@ dependencies {
     // compileOnly("org.spigotmc:spigot:1.20") // NMS
 
     compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly(files("libs/Residence.jar"))
 
     implementation("net.kyori:adventure-api:4.22.0")
     implementation("net.kyori:adventure-platform-bukkit:4.4.0")
