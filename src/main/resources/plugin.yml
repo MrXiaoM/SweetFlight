@@ -4,6 +4,7 @@ main: top.mrxiaom.sweet.flight.SweetFlight
 api-version: 1.13
 softdepend:
   - PlaceholderAPI
+  - Residence
 authors: [ MrXiaoM ]
 commands:
   sweetflight:
