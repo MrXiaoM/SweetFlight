@@ -1,6 +1,7 @@
 package top.mrxiaom.sweet.flight.func;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -12,10 +13,12 @@ import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.ColorHelper;
 import top.mrxiaom.sweet.flight.Messages;
 import top.mrxiaom.sweet.flight.SweetFlight;
+import top.mrxiaom.sweet.flight.api.IFlyChecker;
 import top.mrxiaom.sweet.flight.database.FlightDatabase;
 import top.mrxiaom.sweet.flight.func.entry.Group;
 import top.mrxiaom.sweet.flight.func.entry.PlayerData;
@@ -34,6 +37,7 @@ public class FlightManager extends AbstractModule implements Listener {
     private String bossBarFlying;
     private String formatHour, formatHours, formatMinute, formatMinutes, formatSecond, formatSeconds, formatInfinite;
     private List<Player> toLoad = new ArrayList<>();
+    private List<IFlyChecker> flyCheckers = new ArrayList<>();
     public FlightManager(SweetFlight plugin) {
         super(plugin);
         toLoad.addAll(Bukkit.getOnlinePlayers());
@@ -47,6 +51,14 @@ public class FlightManager extends AbstractModule implements Listener {
 
     public PlayerData getOrCreate(Player player) {
         return players.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerData(player, 0, 0, LocalDateTime.now()));
+    }
+
+    /**
+     * 注册飞行兼容检查器
+     */
+    public void registerChecker(IFlyChecker checker) {
+        flyCheckers.add(checker);
+        flyCheckers.sort(Comparator.comparingInt(IFlyChecker::priority));
     }
 
     @Override
@@ -96,6 +108,20 @@ public class FlightManager extends AbstractModule implements Listener {
         }
     }
 
+    /**
+     * 获取玩家在此位置是否可以飞行
+     * @param player 玩家
+     * @param loc 目标位置
+     */
+    public boolean canPlayerFlyAt(@NotNull Player player, @NotNull Location loc) {
+        for (IFlyChecker checker : flyCheckers) {
+            if (!checker.canPlayerFlyAt(player, loc)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
@@ -120,17 +146,22 @@ public class FlightManager extends AbstractModule implements Listener {
             status = extra = 0;
         }
         if (!player.hasPermission("sweet.flight.bypass")) {
-            if (standard == -1) { // 无限飞行时间，开启飞行
-                player.setAllowFlight(true);
+            if (!canPlayerFlyAt(player, player.getLocation())) {
+                player.setAllowFlight(false);
+                player.setFlying(false);
             } else {
-                if (extra == 0 && status == 0) { // 如果时间耗尽，提示并关闭飞行
-                    if (standard > 0) {
-                        Messages.time_not_enough__join.tm(player);
-                    }
-                    player.setFlying(false);
-                    player.setAllowFlight(false);
-                } else { // 如果时间未耗尽，开启飞行
+                if (standard == -1) { // 无限飞行时间，开启飞行
                     player.setAllowFlight(true);
+                } else {
+                    if (extra == 0 && status == 0) { // 如果时间耗尽，提示并关闭飞行
+                        if (standard > 0) {
+                            Messages.time_not_enough__join.tm(player);
+                        }
+                        player.setFlying(false);
+                        player.setAllowFlight(false);
+                    } else { // 如果时间未耗尽，开启飞行
+                        player.setAllowFlight(true);
+                    }
                 }
             }
         } else {
@@ -170,6 +201,11 @@ public class FlightManager extends AbstractModule implements Listener {
                     e.setCancelled(true);
                     return;
                 }
+                // 如果其它插件不允许玩家飞行，则关闭飞行
+                if (!canPlayerFlyAt(player, e.getPlayer().getLocation())) {
+                    e.setCancelled(true);
+                    return;
+                }
                 // 如果时间耗尽，提醒玩家并关闭飞行
                 if (data.status == 0 && data.extra == 0) {
                     Messages.time_not_enough__start.tm(player);
@@ -200,7 +236,17 @@ public class FlightManager extends AbstractModule implements Listener {
                 // 如果玩家正在飞行
                 if (player.isFlying()) {
                     boolean update = true;
-                    if (standard >= 0) { // 如果不是无限飞行时间
+                    // 如果其它插件禁止玩家飞行
+                    if (!canPlayerFlyAt(player, player.getLocation())) {
+                        update = false;
+                        // 关闭飞行，关闭血条
+                        player.setFlying(false);
+                        player.setAllowFlight(false);
+                        if (data.bossBar != null) {
+                            data.bossBar.removeAll();
+                            data.bossBar = null;
+                        }
+                    } else if (standard >= 0) { // 如果不是无限飞行时间
                         // 优先扣除额外飞行时间，额外飞行时间不够再扣除基础飞行时间
                         if (data.extra > 0) data.extra--;
                         else if (data.status > 0) data.status--;
