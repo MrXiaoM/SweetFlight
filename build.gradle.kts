@@ -24,13 +24,13 @@ dependencies {
 
     compileOnly("me.clip:placeholderapi:2.11.6")
 
-    implementation("net.kyori:adventure-api:4.21.0")
+    implementation("net.kyori:adventure-api:4.22.0")
     implementation("net.kyori:adventure-platform-bukkit:4.4.0")
-    implementation("net.kyori:adventure-text-minimessage:4.21.0")
+    implementation("net.kyori:adventure-text-minimessage:4.22.0")
     implementation("com.zaxxer:HikariCP:4.0.3") { isTransitive = false }
     implementation("com.github.technicallycoded:FoliaLib:0.4.4")
     implementation("org.jetbrains:annotations:24.0.0")
-    implementation("top.mrxiaom:PluginBase:1.4.5")
+    implementation("top.mrxiaom:PluginBase:1.4.9")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
