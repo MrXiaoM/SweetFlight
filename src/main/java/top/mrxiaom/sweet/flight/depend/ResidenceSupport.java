@@ -23,6 +23,7 @@ public class ResidenceSupport extends AbstractModule implements IFlyChecker {
 
     @Override
     public boolean canPlayerFlyAt(@NotNull Player player, @NotNull Location loc) {
+        if (player.hasPermission("residence.bypass.nofly")) return true;
         ClaimedResidence res = ResidenceApi.getResidenceManager().getByLoc(loc);
         if (res != null) {
             ResidencePermissions perm = res.getPermissions();
