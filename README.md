@@ -32,8 +32,8 @@ Minecraft 限时飞行插件
 | 命令                    | 描述                   | 权限                          |
 |-----------------------|----------------------|-----------------------------|
 | 玩家命令                  |                      |                             |
-| `/sf on`              | 开启飞行                 | 无                           |
-| `/sf off`             | 关闭飞行                 | 无                           |
+| `/sf on`              | 开启飞行                 | `sweet.flight.toggle`       |
+| `/sf off`             | 关闭飞行                 | `sweet.flight.toggle`       |
 | `/sf check`           | 查看当前飞行组，以及可用飞行时间     | `sweet.flight.check`        |
 | 管理员命令                 |                      |                             |
 | `/sf on [玩家]`         | 开启自己或某人的飞行           | `sweet.flight.toggle.other` |

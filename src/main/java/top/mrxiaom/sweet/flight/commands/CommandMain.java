@@ -50,7 +50,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length >= 1 && "on".equalsIgnoreCase(args[0])) {
+        if (args.length >= 1 && "on".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.toggle")) {
             Player target;
             if (args.length == 2) {
                 if (!sender.hasPermission("sweet.flight.toggle.other")) {
@@ -84,7 +84,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             target.setFlying(true);
             return Messages.command__on__success.tm(sender);
         }
-        if (args.length >= 1 && "off".equalsIgnoreCase(args[0])) {
+        if (args.length >= 1 && "off".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.toggle")) {
             Player target;
             if (args.length == 2) {
                 if (!sender.hasPermission("sweet.flight.toggle.other")) {
