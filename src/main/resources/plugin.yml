@@ -6,6 +6,7 @@ softdepend:
   - PlaceholderAPI
   - Residence
 authors: [ MrXiaoM ]
+folia-supported: true
 commands:
   sweetflight:
     description: 'The main command of SweetFlight'
