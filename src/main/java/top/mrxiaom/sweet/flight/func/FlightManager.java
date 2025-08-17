@@ -1,6 +1,7 @@
 package top.mrxiaom.sweet.flight.func;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -239,17 +240,26 @@ public class FlightManager extends AbstractModule implements Listener {
                     e.setCancelled(true);
                     return;
                 }
-                // 如果时间耗尽，且其它插件没有允许玩家在此无限飞行，提醒玩家并关闭飞行
-                if (data.status == 0 && data.extra == 0 && !canInfiniteFly(player, loc)) {
-                    Messages.time_not_enough__start.tm(player);
-                    player.setFlying(false);
-                    player.setAllowFlight(false);
-                    e.setCancelled(true);
-                    return;
+                if (isGameModeCannotFly(player)) {
+                    // 如果时间耗尽，且其它插件没有允许玩家在此无限飞行，提醒玩家并关闭飞行
+                    if (data.status == 0 && data.extra == 0 && !canInfiniteFly(player, loc)) {
+                        Messages.time_not_enough__start.tm(player);
+                        player.setFlying(false);
+                        player.setAllowFlight(false);
+                        e.setCancelled(true);
+                        return;
+                    }
                 }
             }
         }
-        updateBossBar(data, standard);
+        if (isGameModeCannotFly(player)) {
+            updateBossBar(data, standard);
+        }
+    }
+
+    private boolean isGameModeCannotFly(Player player) {
+        GameMode gameMode = player.getGameMode();
+        return gameMode.equals(GameMode.SURVIVAL) || gameMode.equals(GameMode.ADVENTURE);
     }
 
     private void everySecond() {
@@ -267,7 +277,7 @@ public class FlightManager extends AbstractModule implements Listener {
                 db.setPlayerStatus(player, data.status, data.outdate);
             } else {
                 // 如果玩家正在飞行
-                if (player.isFlying()) {
+                if (isGameModeCannotFly(player) && player.isFlying()) {
                     boolean update = true;
                     Location loc = player.getLocation();
                     // 如果其它插件禁止玩家飞行
