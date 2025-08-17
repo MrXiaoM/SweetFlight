@@ -18,5 +18,11 @@ time-format:
   seconds: '%d秒'
   infinite: '无限'
 
+# 飞行时间消耗顺序
+# 默认为先消耗额外时间，额外时间不够再消耗基础时间
+time-consume-order:
+  - extra
+  - standard
+
 boss-bar:
   flying: '&f剩余飞行时间: &e%format%'

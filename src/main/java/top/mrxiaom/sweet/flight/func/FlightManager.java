@@ -38,6 +38,7 @@ public class FlightManager extends AbstractModule implements Listener {
     private String formatHour, formatHours, formatMinute, formatMinutes, formatSecond, formatSeconds, formatInfinite;
     private List<Player> toLoad = new ArrayList<>();
     private List<IFlyChecker> flyCheckers = new ArrayList<>();
+    private List<String> timeConsumeOrder = new ArrayList<>();
     public FlightManager(SweetFlight plugin) {
         super(plugin);
         toLoad.addAll(Bukkit.getOnlinePlayers());
@@ -88,6 +89,18 @@ public class FlightManager extends AbstractModule implements Listener {
         this.formatSecond = config.getString("time-format.second", "%d秒");
         this.formatSeconds = config.getString("time-format.seconds", "%d秒");
         this.formatInfinite = config.getString("time-format.infinite", "无限");
+
+        this.timeConsumeOrder.clear();
+        this.timeConsumeOrder.addAll(config.getStringList("time-consume-order"));
+        if (!timeConsumeOrder.contains("extra")) {
+            timeConsumeOrder.add("extra");
+            warn("time-consume-order 中未发现 extra");
+        }
+        if (!timeConsumeOrder.contains("standard")) {
+            timeConsumeOrder.add("standard");
+            warn("time-consume-order 中未发现 standard");
+        }
+
         for (Player player : toLoad) {
             onJoin(player);
         }
@@ -269,10 +282,21 @@ public class FlightManager extends AbstractModule implements Listener {
                         }
                         // 如果不是无限飞行时间，且其它插件没有允许玩家进行无限飞行
                     } else if (standard >= 0 && !canInfiniteFly(player, loc)) {
-                        // 优先扣除额外飞行时间，额外飞行时间不够再扣除基础飞行时间
-                        if (data.extra > 0) data.extra--;
-                        else if (data.status > 0) data.status--;
-                        else { // 如果时间都不够的话，取消飞行状态
+                        // 优先扣除额外飞行时间
+                        boolean success = false;
+                        for (String order : timeConsumeOrder) {
+                            if ("extra".equals(order) && data.extra > 0) {
+                                data.extra--;
+                                success = true;
+                                break;
+                            }
+                            if ("standard".equals(order) && data.status > 0) {
+                                data.status--;
+                                success = true;
+                                break;
+                            }
+                        }
+                        if (!success) { // 如果时间都不够的话，取消飞行状态
                             update = false;
                             Messages.time_not_enough__timer.tm(player);
                             player.setFlying(false);
