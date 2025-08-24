@@ -342,7 +342,7 @@ public class FlightManager extends AbstractModule implements Listener {
     private void updateBossBar(PlayerData data, int standard) {
         int current = data.status + data.extra; // 当前剩余的总飞行时间
         // 更新血条进度
-        double progress = standard <= 0 ? 1.0 : Math.min(1.0, (double) current / standard);
+        double progress = standard <= 0 ? 1.0 : Math.min(1.0, Math.max(0.0, (double) current / standard));
         // 更新血条标题
         String format = standard == -1 ? formatInfinite : formatTime(current);
         String title = ColorHelper.parseColor(bossBarFlying.replace("%format%", format));
