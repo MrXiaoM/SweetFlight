@@ -3,6 +3,7 @@ package top.mrxiaom.sweet.flight.func;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -11,14 +12,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.ColorHelper;
+import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.flight.Messages;
 import top.mrxiaom.sweet.flight.SweetFlight;
+import top.mrxiaom.sweet.flight.api.EnumWorldMode;
 import top.mrxiaom.sweet.flight.api.IFlyChecker;
 import top.mrxiaom.sweet.flight.database.FlightDatabase;
 import top.mrxiaom.sweet.flight.func.entry.Group;
@@ -40,6 +44,9 @@ public class FlightManager extends AbstractModule implements Listener {
     private List<Player> toLoad = new ArrayList<>();
     private List<IFlyChecker> flyCheckers = new ArrayList<>();
     private List<String> timeConsumeOrder = new ArrayList<>();
+    private EnumWorldMode worldMode;
+    private final Set<String> worldWhiteList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    private final Set<String> worldBlackList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     public FlightManager(SweetFlight plugin) {
         super(plugin);
         toLoad.addAll(Bukkit.getOnlinePlayers());
@@ -63,6 +70,24 @@ public class FlightManager extends AbstractModule implements Listener {
         flyCheckers.sort(Comparator.comparingInt(IFlyChecker::priority));
     }
 
+    /**
+     * 世界是否处于 <code>config.yml</code> 定义的“指定世界”中
+     * @see FlightManager#isEnabledWorld(String)
+     */
+    public boolean isEnabledWorld(World world) {
+        return isEnabledWorld(world.getName());
+    }
+
+    /**
+     * 世界是否处于 <code>config.yml</code> 定义的“指定世界”中
+     * @param worldName 世界名
+     */
+    public boolean isEnabledWorld(String worldName) {
+        if (worldBlackList.contains(worldName)) return false;
+        if (worldWhiteList.isEmpty()) return true;
+        return worldWhiteList.contains(worldName);
+    }
+
     @Override
     public void reloadConfig(MemoryConfiguration config) {
         String timeStr = config.getString("reset-time", "4:00:00");
@@ -82,6 +107,19 @@ public class FlightManager extends AbstractModule implements Listener {
         } catch (NumberFormatException ignored) {
         }
         this.resetTime = resetTime;
+
+        EnumWorldMode worldMode = Util.valueOrNull(EnumWorldMode.class, config.getString("worlds.mode"));
+        if (worldMode == null) {
+            this.worldMode = EnumWorldMode.HANDLE_ALL;
+            warn("配置 worlds.mode 的值无效，已使用缺省值 HANDLE_ALL");
+        } else {
+            this.worldMode = worldMode;
+        }
+        worldWhiteList.clear();
+        worldBlackList.clear();
+        worldWhiteList.addAll(config.getStringList("worlds.whitelist"));
+        worldBlackList.addAll(config.getStringList("worlds.blacklist"));
+
         this.bossBarFlying = config.getString("boss-bar.flying", "");
         this.formatHour = config.getString("time-format.hour", "%d时");
         this.formatHours = config.getString("time-format.hours", "%d时");
@@ -103,7 +141,12 @@ public class FlightManager extends AbstractModule implements Listener {
         }
 
         for (Player player : toLoad) {
-            onJoin(player);
+            if (isEnabledWorld(player.getWorld())) {
+                onJoin(player);
+            } else {
+                player.setFlying(false);
+                player.setAllowFlight(false);
+            }
         }
         toLoad.clear();
     }
@@ -153,8 +196,14 @@ public class FlightManager extends AbstractModule implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        plugin.getScheduler().runTask(() -> onJoin(player));
+        if (isEnabledWorld(player.getWorld())) {
+            plugin.getScheduler().runTask(() -> onJoin(player));
+        } else {
+            player.setFlying(false);
+            player.setAllowFlight(false);
+        }
     }
+
     public void onJoin(Player player) {
         int standard = GroupManager.inst().getFlightSeconds(player);
         UUID uuid = player.getUniqueId();
@@ -216,8 +265,35 @@ public class FlightManager extends AbstractModule implements Listener {
     }
 
     @EventHandler
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent e) {
+        Player player = e.getPlayer();
+
+        // 如果从 “指定世界” 进入其它世界，关闭玩家飞行
+        if (isEnabledWorld(e.getFrom()) && !isEnabledWorld(player.getWorld())) {
+            player.setFlying(false);
+            player.setAllowFlight(false);
+        }
+    }
+
+    @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
         Player player = e.getPlayer();
+
+        boolean flag = isEnabledWorld(player.getWorld());
+        switch (worldMode) {
+            case HANDLE_ALL:
+                if (!flag) {
+                    player.setFlying(false);
+                    player.setAllowFlight(false);
+                    return;
+                }
+                break;
+            case NOT_HANDLE:
+                if (!flag) {
+                    return;
+                }
+                break;
+        }
         int standard = GroupManager.inst().getFlightSeconds(player);
         PlayerData data = players.get(player.getUniqueId());
         if (!e.isFlying()) { // 关闭飞行时移除血条
@@ -267,6 +343,21 @@ public class FlightManager extends AbstractModule implements Listener {
         GroupManager groups = GroupManager.inst();
         LocalDateTime now = LocalDateTime.now();
         for (Player player : Bukkit.getOnlinePlayers()) {
+            boolean flag = isEnabledWorld(player.getWorld());
+            switch (worldMode) {
+                case HANDLE_ALL:
+                    if (!flag) {
+                        player.setFlying(false);
+                        player.setAllowFlight(false);
+                        continue;
+                    }
+                    break;
+                case NOT_HANDLE:
+                    if (!flag) {
+                        continue;
+                    }
+                    break;
+            }
             // 获取玩家的基础飞行时间
             int standard = groups.getFlightSeconds(player);
             PlayerData data = players.get(player.getUniqueId());
