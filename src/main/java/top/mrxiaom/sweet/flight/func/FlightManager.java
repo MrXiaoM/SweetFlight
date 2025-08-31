@@ -144,8 +144,11 @@ public class FlightManager extends AbstractModule implements Listener {
             if (isEnabledWorld(player.getWorld())) {
                 onJoin(player);
             } else {
-                player.setFlying(false);
-                player.setAllowFlight(false);
+                if (player.isFlying() || player.getAllowFlight()) {
+                    Messages.flight__world_not_allow.tm(player);
+                    player.setFlying(false);
+                    player.setAllowFlight(false);
+                }
             }
         }
         toLoad.clear();
@@ -199,8 +202,11 @@ public class FlightManager extends AbstractModule implements Listener {
         if (isEnabledWorld(player.getWorld())) {
             plugin.getScheduler().runTask(() -> onJoin(player));
         } else {
-            player.setFlying(false);
-            player.setAllowFlight(false);
+            if (player.isFlying() || player.getAllowFlight()) {
+                Messages.flight__world_not_allow.tm(player);
+                player.setFlying(false);
+                player.setAllowFlight(false);
+            }
         }
     }
 
@@ -270,6 +276,7 @@ public class FlightManager extends AbstractModule implements Listener {
 
         // 如果从 “指定世界” 进入其它世界，关闭玩家飞行
         if (isEnabledWorld(e.getFrom()) && !isEnabledWorld(player.getWorld())) {
+            Messages.flight__world_not_allow.tm(player);
             player.setFlying(false);
             player.setAllowFlight(false);
         }
@@ -279,20 +286,23 @@ public class FlightManager extends AbstractModule implements Listener {
     public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
         Player player = e.getPlayer();
 
-        boolean flag = isEnabledWorld(player.getWorld());
-        switch (worldMode) {
-            case HANDLE_ALL:
-                if (!flag) {
-                    player.setFlying(false);
-                    player.setAllowFlight(false);
-                    return;
-                }
-                break;
-            case NOT_HANDLE:
-                if (!flag) {
-                    return;
-                }
-                break;
+        if (e.isFlying()) {
+            boolean flag = isEnabledWorld(player.getWorld());
+            switch (worldMode) {
+                case HANDLE_ALL:
+                    if (!flag) {
+                        Messages.flight__world_not_allow.tm(player);
+                        player.setAllowFlight(false);
+                        e.setCancelled(true);
+                        return;
+                    }
+                    break;
+                case NOT_HANDLE:
+                    if (!flag) {
+                        return;
+                    }
+                    break;
+            }
         }
         int standard = GroupManager.inst().getFlightSeconds(player);
         PlayerData data = players.get(player.getUniqueId());
@@ -347,8 +357,11 @@ public class FlightManager extends AbstractModule implements Listener {
             switch (worldMode) {
                 case HANDLE_ALL:
                     if (!flag) {
-                        player.setFlying(false);
-                        player.setAllowFlight(false);
+                        if (player.isFlying() || player.getAllowFlight()) {
+                            Messages.flight__world_not_allow.tm(player);
+                            player.setFlying(false);
+                            player.setAllowFlight(false);
+                        }
                         continue;
                     }
                     break;

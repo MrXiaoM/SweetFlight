@@ -36,6 +36,8 @@ public enum Messages implements IHolderAccessor {
     time_not_enough__timer("&e飞行时间已耗尽"),
     time_not_enough__command("&e飞行时间已耗尽"),
 
+    flight__world_not_allow("&e当前世界不允许飞行"),
+
     help__normal("&9&lSweetFlight &e&l帮助命令&r",
             "&f/sf on &7开启飞行",
             "&f/sf off &7关闭飞行",
