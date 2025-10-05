@@ -48,25 +48,42 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         }
     }
 
+    private Player parseTarget(CommandSender sender, String[] args, int paramIndex, String othersPermission) {
+        if (args.length >= paramIndex + 1) {
+            if (!sender.hasPermission(othersPermission)) {
+                Messages.no_permission.tm(sender);
+                return null;
+            }
+            Player target = Util.getOnlinePlayer(args[paramIndex]).orElse(null);
+            if (target == null) {
+                Messages.player__not_online.tm(sender);
+                return null;
+            }
+            return target;
+        } else {
+            if (sender instanceof Player) {
+                return (Player) sender;
+            } else {
+                Messages.player__only.tm(sender);
+                return null;
+            }
+        }
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length >= 1 && "on".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.toggle")) {
-            Player target;
-            if (args.length == 2) {
-                if (!sender.hasPermission("sweet.flight.toggle.other")) {
-                    return Messages.no_permission.tm(sender);
-                }
-                target = Util.getOnlinePlayer(args[1]).orElse(null);
-                if (target == null) {
-                    return Messages.player__not_online.tm(sender);
-                }
+        if (args.length >= 1 && "toggle".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.toggle")) {
+            Player target = parseTarget(sender, args, 1, "sweet.flight.toggle.other");
+            if (target == null) return true;
+            if (target.getAllowFlight()) {
+                args[0] = "off";
             } else {
-                if (sender instanceof Player) {
-                    target = (Player) sender;
-                } else {
-                    return Messages.player__only.tm(sender);
-                }
+                args[0] = "on";
             }
+        }
+        if (args.length >= 1 && "on".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.toggle")) {
+            Player target = parseTarget(sender, args, 1, "sweet.flight.toggle.other");
+            if (target == null) return true;
             FlightManager manager = FlightManager.inst();
             int standard = GroupManager.inst().getFlightSeconds(target);
             if (standard >= 0) {
@@ -85,22 +102,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             return Messages.command__on__success.tm(sender);
         }
         if (args.length >= 1 && "off".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.toggle")) {
-            Player target;
-            if (args.length == 2) {
-                if (!sender.hasPermission("sweet.flight.toggle.other")) {
-                    return Messages.no_permission.tm(sender);
-                }
-                target = Util.getOnlinePlayer(args[1]).orElse(null);
-                if (target == null) {
-                    return Messages.player__not_online.tm(sender);
-                }
-            } else {
-                if (sender instanceof Player) {
-                    target = (Player) sender;
-                } else {
-                    return Messages.player__only.tm(sender);
-                }
-            }
+            Player target = parseTarget(sender, args, 1, "sweet.flight.toggle.other");
+            if (target == null) return true;
             target.setFlying(false);
             FlightManager manager = FlightManager.inst();
             PlayerData data = manager.get(target);

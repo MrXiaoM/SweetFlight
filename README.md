@@ -32,10 +32,12 @@ Minecraft 限时飞行插件
 | 命令                    | 描述                   | 权限                          |
 |-----------------------|----------------------|-----------------------------|
 | 玩家命令                  |                      |                             |
+| `/sf toggle`          | 切换飞行状态               | `sweet.flight.toggle`       |
 | `/sf on`              | 开启飞行                 | `sweet.flight.toggle`       |
 | `/sf off`             | 关闭飞行                 | `sweet.flight.toggle`       |
 | `/sf check`           | 查看当前飞行组，以及可用飞行时间     | `sweet.flight.check`        |
 | 管理员命令                 |                      |                             |
+| `/sf toggle [玩家]`     | 切换自己或某人的飞行状态         | `sweet.flight.toggle.other` |
 | `/sf on [玩家]`         | 开启自己或某人的飞行           | `sweet.flight.toggle.other` |
 | `/sf off [玩家]`        | 关闭自己或某人的飞行           | `sweet.flight.toggle.other` |
 | `/sf check [玩家]`      | 查看自己或某人的飞行组，以及可用飞行时间 | `sweet.flight.check.other`  |
