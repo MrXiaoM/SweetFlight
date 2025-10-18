@@ -110,9 +110,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (data == null) {
                 return Messages.player__data_not_found.tm(sender);
             }
-            if (data.extra == 0 && data.status == 0) {
-                target.setAllowFlight(false);
-            }
+            target.setAllowFlight(false);
             return Messages.command__off__success.tm(sender);
         }
         if (args.length >= 1 && "check".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.check")) {
