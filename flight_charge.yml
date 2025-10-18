@@ -1,0 +1,285 @@
+# 适用于Trmenu的SweetFlight飞行菜单配置文件
+# 菜单版本号: 1.0.0
+# 作者: ZXBHELLO
+#============================================================================
+# 容器显示的标题
+Title: '飞行充能菜单'
+
+# 容器标题刷新的时间
+Title-Update: -1
+
+# 菜单布局 (3行5列)
+Layout:
+- '+=======+'
+- 'C       F'
+- 'DA  X  BG'
+- 'E       H'
+- '+===0===+'
+
+# 菜单选项
+Options:
+  Arguments: false
+  Default-Arguments: []
+  Free-Slots: []
+  Default-Layout: 0
+  Hide-Player-Inventory: false
+  Min-Click-Delay: 200
+  Depend-Expansions: [ 'server', 'player', 'progress', 'animations' ]
+
+# 菜单绑定
+Bindings:
+  Commands:
+  - 'flightcharge'
+  - 'flyc'
+  Items: []
+
+# 菜单事件反应
+Events:
+  Open:
+  - condition: 'perm trmenu.use.flightchargemenu'
+    actions:
+    - 'sound: minecraft:block.ender_chest.open'
+    deny:
+    - 'sound: ENTITY_VILLAGER_NO-1-0'
+    - 'return'
+  Close:
+  - 'sound: minecraft:block.ender_chest.close'
+
+# 菜单的图标主体
+Icons:
+  'A':
+    display:
+      material: 'GOLD_INGOT'
+      name: '&e> 金币充能'
+      lore:
+      - '&5-------------------------------------------'
+      - '  &f使用&a服务器货币&f进行充能飞行时长'
+      - '  &f转化比例: &e10金币 = 1分钟'
+      - '&5-------------------------------------------'
+      - '&a点击左侧玻璃板 &d| &f进行充能金币充能'
+    actions:
+      all:
+      - 'sound: BLOCK_LEVER_CLICK-1-0'
+
+  'B':
+    display:
+      material: 'EXPERIENCE_BOTTLE'
+      name: '&e> 经验充能'
+      lore:
+      - '&5-------------------------------------------'
+      - '  &f使用&b经验等级&f进行充能飞行时长'
+      - '  &f转化比例: &e10等级 = 1分钟'
+      - '&5-------------------------------------------'
+      - '&a点击右侧玻璃板 &d| &f进行经验等级充能'
+    actions:
+      all:
+      - 'sound: BLOCK_LEVER_CLICK-1-0'
+
+  'C':
+    display:
+      material: 'yellow_glass_pane'
+      amount: '1'
+      name: '&a> 飞行时间 +1  分钟'
+      Lore:
+      - '&5-------------------------------------------'
+      - '  &f消耗： &e10 金币'
+      - '  &f增加： &a1  分钟'
+      - '&5-------------------------------------------'
+      - '&a点击 &d| &f充能'
+    actions:
+      all:
+      - 'sound: BLOCK_LEVER_CLICK-1-0'
+      - condition: 'check papi "%vault_eco_balance%" >= 10'
+        actions:
+        - 'console: money take %player_name% 10'
+        - 'console: sfly add %player_name% 1m'
+        - 'actionbar: &a成功！您已消耗10金币进行飞行充能！'
+        - 'sound: ENTITY_PLAYER_LEVELUP'
+        deny:
+        - 'actionbar: &c余额不足！您没有足够的金币进行此操作！'
+        - 'close'
+        - 'sound: ENTITY_VILLAGER_NO'
+        - 'delay: 20'
+        - 'open: flight_charge'
+
+  'D':
+    display:
+      material: 'yellow_glass_pane'
+      amount: '16'
+      name: '&a> 飞行时间 +16 分钟'
+      Lore:
+      - '&5-------------------------------------------'
+      - '  &f消耗： &e160 金币'
+      - '  &f增加： &a16  分钟'
+      - '&5-------------------------------------------'
+      - '&a点击 &d| &f充能'
+    actions:
+      all:
+      - 'sound: BLOCK_LEVER_CLICK-1-0'
+      - condition: 'check papi "%vault_eco_balance%" >= 160'
+        actions:
+        - 'console: money take %player_name% 160'
+        - 'console: sfly add %player_name% 16m'
+        - 'actionbar: &a成功！您已消耗160金币进行飞行充能！'
+        - 'sound: ENTITY_PLAYER_LEVELUP'
+        deny:
+        - 'actionbar: &c余额不足！您没有足够的金币进行此操作！'
+        - 'close'
+        - 'sound: ENTITY_VILLAGER_NO'
+        - 'delay: 20'
+        - 'open: flight_charge'
+
+  'E':
+    display:
+      material: 'yellow_glass_pane'
+      amount: '64'
+      name: '&a> 飞行时间 +64 分钟'
+      Lore:
+      - '&5-------------------------------------------'
+      - '  &f消耗： &e640 金币'
+      - '  &f增加： &a64  分钟'
+      - '&5-------------------------------------------'
+      - '&a点击 &d| &f充能'
+    actions:
+      all:
+      - 'sound: BLOCK_LEVER_CLICK-1-0'
+      - condition: 'check papi "%vault_eco_balance%" >= 640'
+        actions:
+        - 'console: money take %player_name% 640'
+        - 'console: sfly add %player_name% 64m'
+        - 'actionbar: &a成功！您已消耗640金币进行飞行充能！'
+        - 'sound: ENTITY_PLAYER_LEVELUP'
+        deny:
+        - 'actionbar: &c余额不足！您没有足够的金币进行此操作！'
+        - 'close'
+        - 'sound: ENTITY_VILLAGER_NO'
+        - 'delay: 20'
+        - 'open: flight_charge'
+
+  'F':
+    display:
+      material: 'yellow_glass_pane'
+      amount: '1'
+      name: '&a> 飞行时间 +1  分钟'
+      Lore:
+      - '&5-------------------------------------------'
+      - '  &f消耗： &b10 等级'
+      - '  &f增加： &a1  分钟'
+      - '&5-------------------------------------------'
+      - '&a点击 &d| &f充能'
+    actions:
+      all:
+      - 'sound: BLOCK_LEVER_CLICK-1-0'
+      - condition: 'check papi "%player_level%" >= 10'
+        actions:
+        - 'console: xp add %player_name% -10 levels'
+        - 'console: sfly add %player_name% 1m'
+        - 'actionbar: &a成功！您已消耗10等级进行飞行充能！'
+        - 'sound: ENTITY_PLAYER_LEVELUP'
+        deny:
+        - 'actionbar: &c余额不足！您没有足够的等级进行此操作！'
+        - 'close'
+        - 'sound: ENTITY_VILLAGER_NO'
+        - 'delay: 20'
+        - 'open: flight_charge'
+
+  'G':
+    display:
+      material: 'yellow_glass_pane'
+      amount: '16'
+      name: '&a> 飞行时间 +16 分钟'
+      Lore:
+      - '&5-------------------------------------------'
+      - '  &f消耗： &b160 等级'
+      - '  &f增加： &a16  分钟'
+      - '&5-------------------------------------------'
+      - '&a点击 &d| &f充能'
+    actions:
+      all:
+      - 'sound: BLOCK_LEVER_CLICK-1-0'
+      - condition: 'check papi "%player_level%" >= 160'
+        actions:
+        - 'console: xp add %player_name% -160 levels'
+        - 'console: sfly add %player_name% 16m'
+        - 'actionbar: &a成功！您已消耗160等级进行飞行充能！'
+        - 'sound: ENTITY_PLAYER_LEVELUP'
+        deny:
+        - 'actionbar: &c余额不足！您没有足够的等级进行此操作！'
+        - 'close'
+        - 'sound: ENTITY_VILLAGER_NO'
+        - 'delay: 20'
+        - 'open: flight_charge'
+
+  'H':
+    display:
+      material: 'yellow_glass_pane'
+      amount: '64'
+      name: '&a> 飞行时间 +64 分钟'
+      Lore:
+      - '&5-------------------------------------------'
+      - '  &f消耗： &b640 等级'
+      - '  &f增加： &a64  分钟'
+      - '&5-------------------------------------------'
+      - '&a点击 &d| &f充能'
+    actions:
+      all:
+      - 'sound: BLOCK_LEVER_CLICK-1-0'
+      - condition: 'check papi "%player_level%" >= 640'
+        actions:
+        - 'console: xp add %player_name% -640 levels'
+        - 'console: sfly add %player_name% 64m'
+        - 'actionbar: &a成功！您已消耗640等级进行飞行充能！'
+        - 'sound: ENTITY_PLAYER_LEVELUP'
+        deny:
+        - 'actionbar: &c余额不足！您没有足够的等级进行此操作！'
+        - 'close'
+        - 'sound: ENTITY_VILLAGER_NO'
+        - 'delay: 20'
+        - 'open: flight_charge'
+  'X':
+    display:
+      update: 10
+      material: 'nether_star'
+      name: '&c> 飞行信息'
+      lore:
+      - '&5-------------------------------------------'
+      - '  &f当前飞行状态: %player_allow_flight%'
+      - '  &f剩余飞行时间: &e%sweetflight_time%'
+      - '  &7TPI: 信息延迟更新'
+      - '&5-------------------------------------------'
+      - '  &f每日基础时间: %sweetflight_standard_time%'
+      - '&5-------------------------------------------'
+      - '&a点击 &d| &f切换飞行状态'
+    actions:
+    - 'sound: BLOCK_LEVER_CLICK-1-0'
+    - condition: 'check papi "%player_allow_flight%" == no'
+      actions:
+      - 'command: sfly on'
+      deny:
+      - 'command: sfly off'
+
+  '0':
+    display:
+      material: 'KNOWLEDGE_BOOK'
+      name: '&e> 主菜单'
+    actions:
+    - 'open: main'
+  '=':
+    display:
+      material: 'black_stained_glass_pane'
+      name: '边框'
+    actions:
+    - 'sound: minecraft:block.amethyst_block.resonate'
+
+  '+':
+    display:
+      material: 'blue_stained_glass_pane'
+      name: '边框'
+    actions:
+    - 'sound: minecraft:block.amethyst_block.resonate'
+
+# 定时任务
+Tasks: {}
+
+# 内置自定义 JavaScript 函数
+Functions: {}
