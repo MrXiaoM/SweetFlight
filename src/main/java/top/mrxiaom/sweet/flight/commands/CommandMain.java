@@ -110,9 +110,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (data == null) {
                 return Messages.player__data_not_found.tm(sender);
             }
-            if (data.extra == 0 && data.status == 0) {
-                target.setAllowFlight(false);
-            }
+            target.setAllowFlight(false);
             return Messages.command__off__success.tm(sender);
         }
         if (args.length >= 1 && "check".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.check")) {
@@ -256,8 +254,11 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
             List<String> list = new ArrayList<>();
-            list.add("on");
-            list.add("off");
+            if (sender.hasPermission("sweet.flight.toggle")) {
+                list.add("on");
+                list.add("off");
+                list.add("toggle");
+            }
             if (sender.hasPermission("sweet.flight.check")) {
                 list.add("check");
             }
@@ -295,6 +296,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         return startsWith(null, list, s);
     }
     public List<String> startsWith(String[] addition, Collection<String> list, String s) {
+        if (list.isEmpty()) return new ArrayList<>(list);
         String s1 = s.toLowerCase();
         List<String> stringList = new ArrayList<>(list);
         if (addition != null) stringList.addAll(0, Lists.newArrayList(addition));
