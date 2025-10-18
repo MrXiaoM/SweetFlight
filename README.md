@@ -101,17 +101,17 @@ Minecraft 限时飞行插件
 ### 菜单前置
 
 - [Trmenu](https://taboo.8aka.cn/TrMenu/) 插件
-- [vualt](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/vault) 或 [ServerceIO(推荐)](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/ServiceIO) 插件 (仅需一个即可]
+- [Vualt](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/vault) 或 [ServerceIO(推荐)](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/ServiceIO) 插件 (仅需一个即可]
 - [XConomy](https://github.com/YiC200333/XConomy) 插件·
 - [PlaceholderAPI](https://modrinth.com/plugin/placeholderapi) 插件
-- [luckyperms](https://luckperms.net/) 或类似的权限管理插件 (仅需一个即可]
+- [Luckyperms](https://luckperms.net/) 或其他权限管理插件
 
 ### 菜单安装教程
 
 1. 安装上述前置插件
 2. 将 `flight_charge.yml` 文件放入 `plugins/TrMenu/menus` 目录下
-3. 重载TRMenu插件
-4. 确保玩家`trmenu.use.flightchargemenu`权限(使用菜单权限)
+3. 重载Trmenu插件
+4. 确保玩家拥有`trmenu.use.flightchargemenu`权限(使用菜单权限)
 5. 输入`/flyc`或`/flightcharge`打开飞行菜单
 
 ## 开发者
