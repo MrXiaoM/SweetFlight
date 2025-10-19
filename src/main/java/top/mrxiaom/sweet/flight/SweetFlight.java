@@ -3,18 +3,26 @@ package top.mrxiaom.sweet.flight;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.func.LanguageManager;
+import top.mrxiaom.pluginbase.resolver.DefaultLibraryResolver;
+import top.mrxiaom.pluginbase.utils.ClassLoaderWrapper;
 import top.mrxiaom.pluginbase.utils.PAPI;
 import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 import top.mrxiaom.sweet.flight.database.FlightDatabase;
+
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.List;
 
 public class SweetFlight extends BukkitPlugin {
     public static SweetFlight getInstance() {
         return (SweetFlight) BukkitPlugin.getInstance();
     }
 
-    public SweetFlight() {
+    public SweetFlight() throws Exception {
         super(options()
                 .bungee(false)
                 .adventure(true)
@@ -23,6 +31,20 @@ public class SweetFlight extends BukkitPlugin {
                 .scanIgnore("top.mrxiaom.sweet.flight.libs")
         );
         this.scheduler = new FoliaLibScheduler(this);
+
+        info("正在检查依赖库状态");
+        File librariesDir = ClassLoaderWrapper.isSupportLibraryLoader
+                ? new File("libraries")
+                : new File(this.getDataFolder(), "libraries");
+        DefaultLibraryResolver resolver = new DefaultLibraryResolver(getLogger(), librariesDir);
+
+        resolver.addLibrary(BuildConstants.LIBRARIES);
+
+        List<URL> libraries = resolver.doResolve();
+        info("正在添加 " + libraries.size() + " 个依赖库到类加载器");
+        for (URL library : libraries) {
+            this.classLoader.addURL(library);
+        }
     }
     private boolean onlineMode;
     private FlightDatabase flightDatabase;
@@ -32,6 +54,13 @@ public class SweetFlight extends BukkitPlugin {
 
     public boolean isOnlineMode() {
         return onlineMode;
+    }
+
+    @Override
+    protected @NotNull ClassLoaderWrapper initClassLoader(URLClassLoader classLoader) {
+        return ClassLoaderWrapper.isSupportLibraryLoader
+                ? new ClassLoaderWrapper(ClassLoaderWrapper.findLibraryLoader(classLoader))
+                : new ClassLoaderWrapper(classLoader);
     }
 
     @Override
