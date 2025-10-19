@@ -128,14 +128,16 @@ public class FlightManager extends AbstractModule implements Listener {
             // 如果当前版本不支持新版 BOSS 血条 (1.8)，不再对其支持，改用物品栏上方消息
             bossBarDisplayMode = EnumDisplayMode.ACTION_BAR;
         }
+        boolean shouldUpdateBossBar = false;
         if (!bossBarDisplayMode.equals(this.bossBarDisplayMode)) {
-            // 如果显示方式发生变动，移除所有人的当前剩余时间显示，等到定时器下一次循环自动添加回去
+            // 如果显示方式发生变动，移除所有人的当前剩余时间显示
             for (PlayerData data : players.values()) {
                 if (data.bossBar != null) {
                     data.bossBar.removeAll();
                     data.bossBar = null;
                 }
             }
+            shouldUpdateBossBar = true;
         } else if (this.bossBarDisplayMode.equals(EnumDisplayMode.BOSS_BAR)) {
             for (PlayerData data : players.values()) {
                 if (data.bossBar instanceof DisplayBossBar) {
@@ -145,6 +147,14 @@ public class FlightManager extends AbstractModule implements Listener {
             }
         }
         this.bossBarDisplayMode = bossBarDisplayMode;
+        if (shouldUpdateBossBar) {
+            for (PlayerData data : players.values()) {
+                if (isGameModeCannotFly(data.player)) {
+                    int standard = GroupManager.inst().getFlightSeconds(data.player);
+                    updateBossBar(data, standard);
+                }
+            }
+        }
 
         this.formatHour = config.getString("time-format.hour", "%d时");
         this.formatHours = config.getString("time-format.hours", "%d时");
