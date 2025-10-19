@@ -53,13 +53,15 @@ Icons:
       name: '&e> 金币充能'
       lore:
       - '&5-------------------------------------------'
-      - '  &f使用&a服务器货币&f进行充能飞行时长'
+      - '  &f使用&a杂鱼服货币&f进行充能飞行时长'
       - '  &f转化比例: &e10金币 = 1分钟'
       - '&5-------------------------------------------'
       - '&a点击左侧玻璃板 &d| &f进行充能金币充能'
     actions:
       all:
       - 'sound: BLOCK_LEVER_CLICK-1-0'
+      - 'delay: 5'
+      - 'update'
 
   'B':
     display:
@@ -74,6 +76,8 @@ Icons:
     actions:
       all:
       - 'sound: BLOCK_LEVER_CLICK-1-0'
+      - 'delay: 5'
+      - 'update'
 
   'C':
     display:
@@ -95,12 +99,16 @@ Icons:
         - 'console: sfly add %player_name% 1m'
         - 'actionbar: &a成功！您已消耗10金币进行飞行充能！'
         - 'sound: ENTITY_PLAYER_LEVELUP'
+        - 'delay: 5'
+        - 'update'
         deny:
         - 'actionbar: &c余额不足！您没有足够的金币进行此操作！'
         - 'close'
         - 'sound: ENTITY_VILLAGER_NO'
         - 'delay: 20'
         - 'open: flight_charge'
+        - 'delay: 5'
+        - 'update'
 
   'D':
     display:
@@ -122,12 +130,16 @@ Icons:
         - 'console: sfly add %player_name% 16m'
         - 'actionbar: &a成功！您已消耗160金币进行飞行充能！'
         - 'sound: ENTITY_PLAYER_LEVELUP'
+        - 'delay: 5'
+        - 'update'
         deny:
         - 'actionbar: &c余额不足！您没有足够的金币进行此操作！'
         - 'close'
         - 'sound: ENTITY_VILLAGER_NO'
         - 'delay: 20'
         - 'open: flight_charge'
+        - 'delay: 5'
+        - 'update'
 
   'E':
     display:
@@ -149,12 +161,16 @@ Icons:
         - 'console: sfly add %player_name% 64m'
         - 'actionbar: &a成功！您已消耗640金币进行飞行充能！'
         - 'sound: ENTITY_PLAYER_LEVELUP'
+        - 'delay: 5'
+        - 'update'
         deny:
         - 'actionbar: &c余额不足！您没有足够的金币进行此操作！'
         - 'close'
         - 'sound: ENTITY_VILLAGER_NO'
         - 'delay: 20'
         - 'open: flight_charge'
+        - 'delay: 5'
+        - 'update'
 
   'F':
     display:
@@ -176,12 +192,16 @@ Icons:
         - 'console: sfly add %player_name% 1m'
         - 'actionbar: &a成功！您已消耗10等级进行飞行充能！'
         - 'sound: ENTITY_PLAYER_LEVELUP'
+        - 'delay: 5'
+        - 'update'
         deny:
         - 'actionbar: &c余额不足！您没有足够的等级进行此操作！'
         - 'close'
         - 'sound: ENTITY_VILLAGER_NO'
         - 'delay: 20'
         - 'open: flight_charge'
+        - 'delay: 5'
+        - 'update'
 
   'G':
     display:
@@ -203,12 +223,16 @@ Icons:
         - 'console: sfly add %player_name% 16m'
         - 'actionbar: &a成功！您已消耗160等级进行飞行充能！'
         - 'sound: ENTITY_PLAYER_LEVELUP'
+        - 'delay: 5'
+        - 'update'
         deny:
         - 'actionbar: &c余额不足！您没有足够的等级进行此操作！'
         - 'close'
         - 'sound: ENTITY_VILLAGER_NO'
         - 'delay: 20'
         - 'open: flight_charge'
+        - 'delay: 5'
+        - 'update'
 
   'H':
     display:
@@ -230,15 +254,18 @@ Icons:
         - 'console: sfly add %player_name% 64m'
         - 'actionbar: &a成功！您已消耗640等级进行飞行充能！'
         - 'sound: ENTITY_PLAYER_LEVELUP'
+        - 'delay: 5'
+        - 'update'
         deny:
         - 'actionbar: &c余额不足！您没有足够的等级进行此操作！'
         - 'close'
         - 'sound: ENTITY_VILLAGER_NO'
         - 'delay: 20'
         - 'open: flight_charge'
+        - 'delay: 5'
+        - 'update'
   'X':
     display:
-      update: 10
       material: 'nether_star'
       name: '&c> 飞行信息'
       lore:
@@ -255,8 +282,12 @@ Icons:
     - condition: 'check papi "%player_allow_flight%" == no'
       actions:
       - 'command: sfly on'
+      - 'delay: 5'
+      - 'update'
       deny:
       - 'command: sfly off'
+      - 'delay: 5'
+      - 'update'
 
   '0':
     display:
@@ -264,6 +295,7 @@ Icons:
       name: '&e> 主菜单'
     actions:
     - 'open: main'
+    
   '=':
     display:
       material: 'black_stained_glass_pane'
