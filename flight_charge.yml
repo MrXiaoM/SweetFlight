@@ -1,5 +1,5 @@
 # 适用于Trmenu的SweetFlight飞行菜单配置文件
-# 菜单版本号: 1.0.0
+# 菜单版本号: 1.0.1
 # 作者: ZXBHELLO
 #============================================================================
 # 容器显示的标题
@@ -295,7 +295,7 @@ Icons:
       name: '&e> 主菜单'
     actions:
     - 'open: main'
-    
+
   '=':
     display:
       material: 'black_stained_glass_pane'
