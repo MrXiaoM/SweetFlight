@@ -19,7 +19,7 @@ Minecraft 限时飞行插件
 在玩家飞行时，如果玩家有剩余的额外飞行时间，会优先消耗额外飞行时间，当额外飞行时间耗尽时，才会去消耗每日基础飞行时间。  
 使用这个消耗机制避免玩家过度囤积额外飞行时间，当然，如果你需要，也可以到配置文件修改飞行时间的消耗优先级。
 
-![alt text](img/Progress_bar.png)
+![preview](img/Progress_bar.png)
 
 ## 兼容性
 
@@ -33,8 +33,6 @@ Minecraft 限时飞行插件
 
 根命令为 `/sweetflight`，别名 `/sweetfly`、`/sflight`、`/sfly`、`/sf`  
 以 `<>` 包裹的为必选参数，以 `[]` 包裹的为可选参数。
-
-![alt text](img/help.png)
 
 ### 玩家命令
 
@@ -84,11 +82,11 @@ Minecraft 限时飞行插件
 
 ## 飞行功能菜单(可选)
 
-> 注意！菜单功能为可选项，SweetFlight本身不依赖任何前置插件，如果你不需要菜单功能，请忽略本部分！
+> 注意！菜单功能为可选项，SweetFlight 本身不依赖任何前置插件，如果你不需要菜单功能，请忽略本部分！
 
 菜单由 [Trmenu](https://taboo.8aka.cn/TrMenu/) 插件提供 (Folia/Paper/Spigot/bukkit)
 
-![alt text](img/menu.png)
+![preview](img/menu.png)
 
 ### 菜单功能
 
@@ -101,18 +99,18 @@ Minecraft 限时飞行插件
 ### 菜单前置
 
 - [Trmenu](https://taboo.8aka.cn/TrMenu/) 插件
-- [Vualt](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/vault) 或 [ServerceIO(推荐)](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/ServiceIO) 插件 (仅需一个即可]
+- [Vault](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/vault) 或 [ServiceIO(推荐)](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/ServiceIO) 插件 (仅需一个即可]
 - [XConomy](https://github.com/YiC200333/XConomy) 插件·
 - [PlaceholderAPI](https://modrinth.com/plugin/placeholderapi) 插件
-- [Luckyperms](https://luckperms.net/) 或其他权限管理插件
+- [LuckPerms](https://luckperms.net/) 或其他权限管理插件
 
 ### 菜单安装教程
 
 1. 安装上述前置插件
 2. 将 `flight_charge.yml` 文件放入 `plugins/TrMenu/menus` 目录下
-3. 重载Trmenu插件
-4. 确保玩家拥有`trmenu.use.flightchargemenu`权限(使用菜单权限)
-5. 输入`/flyc`或`/flightcharge`打开飞行菜单
+3. 重载 Trmenu 插件
+4. 确保玩家拥有 `trmenu.use.flightchargemenu` 权限(使用菜单权限)
+5. 输入 `/flyc` 或 `/flightcharge` 打开飞行菜单
 
 ## 开发者
 
