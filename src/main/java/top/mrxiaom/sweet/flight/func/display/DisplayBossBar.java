@@ -14,6 +14,14 @@ public class DisplayBossBar implements IBarDisplay {
         BarStyle style = Util.valueOr(BarStyle.class, barStyle, BarStyle.SEGMENTED_10);
         this.bossBar = Bukkit.createBossBar(title, color, style);
     }
+
+    public void updateStyle(String barColor, String barStyle) {
+        BarColor color = Util.valueOr(BarColor.class, barColor, BarColor.BLUE);
+        BarStyle style = Util.valueOr(BarStyle.class, barStyle, BarStyle.SEGMENTED_10);
+        this.bossBar.setColor(color);
+        this.bossBar.setStyle(style);
+    }
+
     @Override
     public void removeAll() {
         bossBar.removeAll();

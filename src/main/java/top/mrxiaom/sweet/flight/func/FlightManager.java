@@ -136,6 +136,13 @@ public class FlightManager extends AbstractModule implements Listener {
                     data.bossBar = null;
                 }
             }
+        } else if (this.bossBarDisplayMode.equals(EnumDisplayMode.BOSS_BAR)) {
+            for (PlayerData data : players.values()) {
+                if (data.bossBar instanceof DisplayBossBar) {
+                    DisplayBossBar display = (DisplayBossBar) data.bossBar;
+                    display.updateStyle(bossBarColor, bossBarStyle);
+                }
+            }
         }
         this.bossBarDisplayMode = bossBarDisplayMode;
 
