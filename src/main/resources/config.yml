@@ -40,4 +40,14 @@ time-consume-order:
   - standard
 
 boss-bar:
+  # 剩余时间显示方式
+  # NONE 不显示
+  # ACTION_BAR 显示在物品栏上方 (会与其它同样发送这种消息的插件冲突)
+  # BOSS_BAR 显示在 BOSS 血条 (在 1.9+ 兼容性最好，在 1.8 会自动降级为 ACTION_BAR)
+  display-mode: BOSS_BAR
+  # 剩余飞行时间显示内容，支持 PAPI 变量
   flying: '&f剩余飞行时间: &e%format%'
+  # 血条颜色，https://javadoc.mcio.dev/spigot/1.21.4/org/bukkit/boss/BarColor.html
+  color: BLUE
+  # 血条样式，https://javadoc.mcio.dev/spigot/1.21.4/org/bukkit/boss/BarStyle.html
+  style: SEGMENTED_10

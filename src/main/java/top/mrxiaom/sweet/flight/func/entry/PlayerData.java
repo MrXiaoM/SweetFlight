@@ -1,7 +1,7 @@
 package top.mrxiaom.sweet.flight.func.entry;
 
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import top.mrxiaom.sweet.flight.func.display.IBarDisplay;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +22,7 @@ public class PlayerData {
     /**
      * 玩家的 BOSS 血条实例
      */
-    public BossBar bossBar;
+    public IBarDisplay bossBar;
     /**
      * 存档计数器，减少到 0 之后将上传数据到数据库
      */

@@ -4,14 +4,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -19,13 +15,14 @@ import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.ColorHelper;
+import top.mrxiaom.pluginbase.utils.PAPI;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.flight.Messages;
 import top.mrxiaom.sweet.flight.SweetFlight;
 import top.mrxiaom.sweet.flight.api.EnumWorldMode;
 import top.mrxiaom.sweet.flight.api.IFlyChecker;
 import top.mrxiaom.sweet.flight.database.FlightDatabase;
-import top.mrxiaom.sweet.flight.func.entry.Group;
+import top.mrxiaom.sweet.flight.func.display.*;
 import top.mrxiaom.sweet.flight.func.entry.PlayerData;
 
 import java.sql.Connection;
@@ -39,7 +36,8 @@ import java.util.*;
 public class FlightManager extends AbstractModule implements Listener {
     private LocalTime resetTime;
     private Map<UUID, PlayerData> players = new HashMap<>();
-    private String bossBarFlying;
+    private EnumDisplayMode bossBarDisplayMode;
+    private String bossBarFlying, bossBarColor, bossBarStyle;
     private String formatHour, formatHours, formatMinute, formatMinutes, formatSecond, formatSeconds, formatInfinite;
     private List<Player> toLoad = new ArrayList<>();
     private List<IFlyChecker> flyCheckers = new ArrayList<>();
@@ -121,6 +119,26 @@ public class FlightManager extends AbstractModule implements Listener {
         worldBlackList.addAll(config.getStringList("worlds.blacklist"));
 
         this.bossBarFlying = config.getString("boss-bar.flying", "");
+        this.bossBarColor = config.getString("boss-bar.color", "BLUE");
+        this.bossBarStyle = config.getString("boss-bar.style", "SEGMENTED_10");
+        EnumDisplayMode bossBarDisplayMode = Util.valueOr(EnumDisplayMode.class,
+                config.getString("boss-bar.display-mode", "BOSS_BAR"),
+                EnumDisplayMode.BOSS_BAR);
+        if (bossBarDisplayMode.equals(EnumDisplayMode.BOSS_BAR) && !Util.isPresent("org.bukkit.boss.BossBar")) {
+            // 如果当前版本不支持新版 BOSS 血条 (1.8)，不再对其支持，改用物品栏上方消息
+            bossBarDisplayMode = EnumDisplayMode.ACTION_BAR;
+        }
+        if (!bossBarDisplayMode.equals(this.bossBarDisplayMode)) {
+            // 如果显示方式发生变动，移除所有人的当前剩余时间显示，等到定时器下一次循环自动添加回去
+            for (PlayerData data : players.values()) {
+                if (data.bossBar != null) {
+                    data.bossBar.removeAll();
+                    data.bossBar = null;
+                }
+            }
+        }
+        this.bossBarDisplayMode = bossBarDisplayMode;
+
         this.formatHour = config.getString("time-format.hour", "%d时");
         this.formatHours = config.getString("time-format.hours", "%d时");
         this.formatMinute = config.getString("time-format.minute", "%d分");
@@ -438,6 +456,16 @@ public class FlightManager extends AbstractModule implements Listener {
         }
     }
 
+    private IBarDisplay createBar(String title) {
+        if (bossBarDisplayMode.equals(EnumDisplayMode.BOSS_BAR)) {
+            return new DisplayBossBar(title, bossBarColor, bossBarStyle);
+        }
+        if (bossBarDisplayMode.equals(EnumDisplayMode.ACTION_BAR)) {
+            return new DisplayActionBar(title);
+        }
+        return DisplayNone.INSTANCE;
+    }
+
     /**
      * 更新飞行时间 BOSS 血条
      * @param data 玩家数据
@@ -449,12 +477,12 @@ public class FlightManager extends AbstractModule implements Listener {
         double progress = standard <= 0 ? 1.0 : Math.min(1.0, Math.max(0.0, (double) current / standard));
         // 更新血条标题
         String format = standard == -1 ? formatInfinite : formatTime(current);
-        String title = ColorHelper.parseColor(bossBarFlying.replace("%format%", format));
-        BossBar bar;
+        String title = ColorHelper.parseColor(PAPI.setPlaceholders(data.player, bossBarFlying.replace("%format%", format)));
+        IBarDisplay bar;
         if (data.bossBar == null) {
-            data.bossBar = Bukkit.createBossBar(title, BarColor.BLUE, BarStyle.SEGMENTED_10);
-            data.bossBar.setProgress(progress);
-            data.bossBar.addPlayer(data.player);
+            bar = data.bossBar = createBar(title);
+            bar.setProgress(progress);
+            bar.addPlayer(data.player);
         } else {
             bar = data.bossBar;
             bar.setTitle(title);
