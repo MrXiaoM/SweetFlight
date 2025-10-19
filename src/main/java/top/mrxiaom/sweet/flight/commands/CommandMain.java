@@ -170,7 +170,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 }
             }
             Messages.command__check__standard.tm(sender, Pair.of("%time%", flight.formatTimeMax(standard)));
-            Messages.command__check__remaining.tm(sender, Pair.of("%time%", flight.formatTime(status + extra)));
+            String remaining = flight.formatTime(status + extra);
+            Messages.command__check__remaining.tm(sender, Pair.of("%time%", standard < 0 ? flight.getFormatInfinite() : remaining), Pair.of("%time_real%", remaining));
             Messages.command__check__remaining_status.tm(sender, Pair.of("%time%", flight.formatTime(status)));
             Messages.command__check__remaining_extra.tm(sender, Pair.of("%time%", flight.formatTime(extra)));
             return true;

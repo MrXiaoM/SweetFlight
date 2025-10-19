@@ -483,6 +483,10 @@ public class FlightManager extends AbstractModule implements Listener {
         return seconds < 0 ? formatInfinite : formatTime(seconds);
     }
 
+    public String getFormatInfinite() {
+        return formatInfinite;
+    }
+
     public static FlightManager inst() {
         return instanceOf(FlightManager.class);
     }
