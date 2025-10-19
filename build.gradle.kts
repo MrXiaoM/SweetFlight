@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "top.mrxiaom.sweet.flight"
-version = "1.0.0"
+version = "1.1.0"
 val targetJavaVersion = 8
 val pluginBaseVersion = "1.6.6"
 val shadowGroup = "top.mrxiaom.sweet.flight.libs"
