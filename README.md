@@ -99,8 +99,8 @@ Minecraft 限时飞行插件
 ### 菜单前置
 
 - [Trmenu](https://taboo.8aka.cn/TrMenu/) 插件
-- [Vault](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/vault) 或 [ServiceIO(推荐)](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/ServiceIO) 插件 (仅需一个即可]
-- [XConomy](https://github.com/YiC200333/XConomy) 插件·
+- [Vault](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/vault) 或 [ServiceIO(推荐)](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/ServiceIO) 插件 (仅需一个即可)
+- [XConomy](https://github.com/YiC200333/XConomy) 或其它经济插件 (自行修改扣费命令)
 - [PlaceholderAPI](https://modrinth.com/plugin/placeholderapi) 插件
 - [LuckPerms](https://luckperms.net/) 或其他权限管理插件
 
