@@ -38,7 +38,7 @@ public class SweetFlight extends BukkitPlugin {
                 : new File(this.getDataFolder(), "libraries");
         DefaultLibraryResolver resolver = new DefaultLibraryResolver(getLogger(), librariesDir);
 
-        resolver.addLibrary(BuildConstants.LIBRARIES);
+        resolver.addResolvedLibrary(BuildConstants.RESOLVED_LIBRARIES);
 
         List<URL> libraries = resolver.doResolve();
         info("正在添加 " + libraries.size() + " 个依赖库到类加载器");
@@ -54,13 +54,6 @@ public class SweetFlight extends BukkitPlugin {
 
     public boolean isOnlineMode() {
         return onlineMode;
-    }
-
-    @Override
-    protected @NotNull ClassLoaderWrapper initClassLoader(URLClassLoader classLoader) {
-        return ClassLoaderWrapper.isSupportLibraryLoader
-                ? new ClassLoaderWrapper(ClassLoaderWrapper.findLibraryLoader(classLoader))
-                : new ClassLoaderWrapper(classLoader);
     }
 
     @Override

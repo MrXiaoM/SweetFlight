@@ -4,12 +4,18 @@ plugins {
     id ("com.gradleup.shadow") version "8.3.0"
     id ("com.github.gmazzo.buildconfig") version "5.6.7"
 }
+buildscript {
+    repositories.mavenCentral()
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.6.7")
+}
 
 group = "top.mrxiaom.sweet.flight"
 version = "1.1.0"
 val targetJavaVersion = 8
-val pluginBaseVersion = "1.6.6"
+val pluginBaseVersion = "1.6.7"
 val shadowGroup = "top.mrxiaom.sweet.flight.libs"
+
+val base = top.mrxiaom.gradle.LibraryHelper(project)
 
 repositories {
     mavenCentral()
@@ -20,11 +26,6 @@ repositories {
     maven("https://repo.rosewooddev.io/repository/public/")
 }
 
-val libraries = arrayListOf<String>()
-fun DependencyHandlerScope.library(dependencyNotation: String) {
-    compileOnly(dependencyNotation)
-    libraries.add(dependencyNotation)
-}
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     // compileOnly("org.spigotmc:spigot:1.20") // NMS
@@ -33,24 +34,23 @@ dependencies {
     compileOnly(files("libs/Residence.jar"))
     compileOnly("org.jetbrains:annotations:24.0.0")
 
-    library("net.kyori:adventure-api:4.22.0")
-    library("net.kyori:adventure-platform-bukkit:4.4.0")
-    library("net.kyori:adventure-text-minimessage:4.22.0")
-    library("net.kyori:adventure-text-serializer-plain:4.22.0")
-    library("com.zaxxer:HikariCP:4.0.3")
+    base.library("net.kyori:adventure-api:4.22.0")
+    base.library("net.kyori:adventure-platform-bukkit:4.4.0")
+    base.library("net.kyori:adventure-text-minimessage:4.22.0")
+    base.library("net.kyori:adventure-text-serializer-plain:4.22.0")
+    base.library("com.zaxxer:HikariCP:4.0.3")
 
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
     implementation("top.mrxiaom.pluginbase:library:$pluginBaseVersion")
-    implementation("top.mrxiaom:LibrariesResolver:$pluginBaseVersion")
+    implementation("top.mrxiaom:LibrariesResolver-Lite:$pluginBaseVersion")
 }
 buildConfig {
     className("BuildConstants")
     packageName("top.mrxiaom.sweet.flight")
 
-    val librariesVararg = libraries.joinToString(", ") { "\"$it\"" }
-
+    base.doResolveLibraries()
     buildConfigField("String", "VERSION", "\"${project.version}\"")
-    buildConfigField("String[]", "LIBRARIES", "new String[] { $librariesVararg }")
+    buildConfigField("String[]", "RESOLVED_LIBRARIES", base.join())
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
