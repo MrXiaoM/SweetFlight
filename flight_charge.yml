@@ -38,6 +38,8 @@ Events:
   - condition: 'perm trmenu.use.flightchargemenu'
     actions:
     - 'sound: minecraft:block.ender_chest.open'
+    - 'delay: 5'
+    - 'update'
     deny:
     - 'sound: ENTITY_VILLAGER_NO-1-0'
     - 'return'
