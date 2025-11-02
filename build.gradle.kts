@@ -33,6 +33,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly(files("libs/Residence.jar"))
     compileOnly("org.jetbrains:annotations:24.0.0")
+    compileOnly("cn.lunadeer:DominionAPI:4.7.3")
 
     base.library("net.kyori:adventure-api:4.22.0")
     base.library("net.kyori:adventure-platform-bukkit:4.4.0")
