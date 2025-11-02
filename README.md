@@ -26,6 +26,7 @@ Minecraft 限时飞行插件
 目前本插件与以下插件兼容：
 
 - [Residence](https://www.spigotmc.org/resources/11480/) -- 兼容领地权限，在有 `nofly` 权限的领地关闭飞行，有 `fly` 权限的领地开启无限飞行。
+- [Dominion](https://www.minebbs.com/resources/7933/) -- 兼容领地权限，在没有 `fly` 权限的领地关闭飞行。
 
 想要添加更多插件兼容吗？参考 [ResidenceSupport.java](https://github.com/MrXiaoM/SweetFlight/blob/main/src/main/java/top/mrxiaom/sweet/flight/depend/ResidenceSupport.java) 向本插件提交 Pull Request 吧！
 
