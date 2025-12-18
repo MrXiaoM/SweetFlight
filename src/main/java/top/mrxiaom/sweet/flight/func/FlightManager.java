@@ -1,5 +1,7 @@
 package top.mrxiaom.sweet.flight.func;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -14,6 +16,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.func.AutoRegister;
+import top.mrxiaom.pluginbase.utils.AdventureUtil;
 import top.mrxiaom.pluginbase.utils.ColorHelper;
 import top.mrxiaom.pluginbase.utils.PAPI;
 import top.mrxiaom.pluginbase.utils.Util;
@@ -494,7 +497,8 @@ public class FlightManager extends AbstractModule implements Listener {
         double progress = standard <= 0 ? 1.0 : Math.min(1.0, Math.max(0.0, (double) current / standard));
         // 更新血条标题
         String format = standard == -1 ? formatInfinite : formatTime(current);
-        String title = ColorHelper.parseColor(PAPI.setPlaceholders(data.player, bossBarFlying.replace("%format%", format)));
+        Component component = AdventureUtil.miniMessage(PAPI.setPlaceholders(data.player, bossBarFlying.replace("%format%", format)));
+        String title = LegacyComponentSerializer.legacySection().serialize(component);
         IBarDisplay bar;
         if (data.bossBar == null) {
             bar = data.bossBar = createBar(title);
