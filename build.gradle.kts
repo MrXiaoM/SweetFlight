@@ -6,16 +6,15 @@ plugins {
 }
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.6.7")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.3")
 }
+val base = top.mrxiaom.gradle.LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.flight"
 version = "1.1.0"
 val targetJavaVersion = 8
-val pluginBaseVersion = "1.6.7"
+val pluginBaseModules = base.modules.run { listOf(library, paper, l10n) }
 val shadowGroup = "top.mrxiaom.sweet.flight.libs"
-
-val base = top.mrxiaom.gradle.LibraryHelper(project)
 
 repositories {
     mavenCentral()
@@ -42,8 +41,10 @@ dependencies {
     base.library("com.zaxxer:HikariCP:4.0.3")
 
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
-    implementation("top.mrxiaom.pluginbase:library:$pluginBaseVersion")
-    implementation("top.mrxiaom:LibrariesResolver-Lite:$pluginBaseVersion")
+    for (artifact in pluginBaseModules) {
+        implementation(artifact)
+    }
+    implementation(base.resolver.lite)
 }
 buildConfig {
     className("BuildConstants")
@@ -67,17 +68,6 @@ tasks {
         ).forEach { (original, target) ->
             relocate(original, "$shadowGroup.$target")
         }
-        listOf(
-            "top/mrxiaom/pluginbase/func/AbstractGui*",
-            "top/mrxiaom/pluginbase/func/gui/*",
-            "top/mrxiaom/pluginbase/utils/IA*",
-            "top/mrxiaom/pluginbase/utils/ItemStackUtil*",
-            "top/mrxiaom/pluginbase/func/GuiManager*",
-            "top/mrxiaom/pluginbase/gui/*",
-            "top/mrxiaom/pluginbase/temporary/*",
-            "top/mrxiaom/pluginbase/utils/Bytes*",
-            "top/mrxiaom/pluginbase/utils/arguments/*",
-        ).forEach(this::exclude)
     }
     val copyTask = create<Copy>("copyBuildArtifact") {
         dependsOn(shadowJar)
