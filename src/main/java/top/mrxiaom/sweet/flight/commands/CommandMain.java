@@ -85,6 +85,14 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             Player target = parseTarget(sender, args, 1, "sweet.flight.toggle.other");
             if (target == null) return true;
             FlightManager manager = FlightManager.inst();
+            if (!target.hasPermission("sweet.flight.bypass")) {
+                if (!manager.isEnabledWorld(target.getWorld())) {
+                    return Messages.flight__world_not_allow.tm(sender);
+                }
+                if (!manager.canPlayerFlyAt(target, target.getLocation())) {
+                    return Messages.flight__loc_not_allow.tm(sender);
+                }
+            }
             int standard = GroupManager.inst().getFlightSeconds(target);
             if (standard >= 0) {
                 PlayerData data = manager.get(target);
