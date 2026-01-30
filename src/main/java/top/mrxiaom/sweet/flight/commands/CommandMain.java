@@ -1,6 +1,7 @@
 package top.mrxiaom.sweet.flight.commands;
         
 import com.google.common.collect.Lists;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -120,6 +121,13 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             }
             target.setAllowFlight(false);
             return Messages.command__off__success.tm(sender);
+        }
+        if (args.length >= 1 && "fake-on".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.test")) {
+            Player target = parseTarget(sender, args, 1, "sweet.flight.test.other");
+            if (target == null) return true;
+            FakeToggleFlightEvent event = new FakeToggleFlightEvent(target, true, plugin.getLogger());
+            Bukkit.getPluginManager().callEvent(event);
+            return t(sender, "&a模拟开启飞行事件广播完成，" + (event.isCancelled() ? "已被取消，详见控制台日志。" : "未被取消。"));
         }
         if (args.length >= 1 && "check".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.flight.check")) {
             Player target;
