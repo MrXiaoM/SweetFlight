@@ -30,6 +30,11 @@ Minecraft 限时飞行插件
 
 想要添加更多插件兼容吗？参考 [ResidenceSupport.java](https://github.com/MrXiaoM/SweetFlight/blob/main/src/main/java/top/mrxiaom/sweet/flight/depend/ResidenceSupport.java) 向本插件提交 Pull Request 吧！
 
+> [!WARNING]
+> 
+> Dominion 默认配置下的**飞行控制行为**会对大多数飞行管理插件**造成破坏**，**即使玩家不在领地内**！请确保你已在 Dominion 配置文件中，设置好 `fly-permission-nodes`。
+>
+
 ## 命令
 
 根命令为 `/sweetflight`，别名 `/sweetfly`、`/sflight`、`/sfly`、`/sf`  
