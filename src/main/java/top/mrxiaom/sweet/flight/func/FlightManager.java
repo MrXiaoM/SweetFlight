@@ -48,6 +48,9 @@ public class FlightManager extends AbstractModule implements Listener {
     private EnumWorldMode worldMode;
     private final Set<String> worldWhiteList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     private final Set<String> worldBlackList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    private boolean dominionInfiniteFly;
+    private boolean residenceInfiniteFly;
+
     public FlightManager(SweetFlight plugin) {
         super(plugin);
         toLoad.addAll(Bukkit.getOnlinePlayers());
@@ -61,6 +64,14 @@ public class FlightManager extends AbstractModule implements Listener {
 
     public PlayerData getOrCreate(Player player) {
         return players.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerData(player, 0, 0, LocalDateTime.now()));
+    }
+
+    public boolean getDominionInfiniteFly() {
+        return dominionInfiniteFly;
+    }
+
+    public boolean getResidenceInfiniteFly() {
+        return residenceInfiniteFly;
     }
 
     /**
@@ -177,6 +188,9 @@ public class FlightManager extends AbstractModule implements Listener {
             timeConsumeOrder.add("standard");
             warn("time-consume-order 中未发现 standard");
         }
+
+        this.dominionInfiniteFly = config.getBoolean("hook.dominion.infinite-fly", true);
+        this.residenceInfiniteFly = config.getBoolean("hook.residence.infinite-fly", true);
 
         for (Player player : toLoad) {
             if (isEnabledWorld(player.getWorld())) {

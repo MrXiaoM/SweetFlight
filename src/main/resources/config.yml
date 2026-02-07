@@ -51,3 +51,11 @@ boss-bar:
   color: BLUE
   # 血条样式，https://javadoc.mcio.dev/spigot/1.21.4/org/bukkit/boss/BarStyle.html
   style: SEGMENTED_10
+
+hook:
+  dominion:
+    # 在 dominion 领地内是否允许无限飞行
+    infinite-fly: true
+  residence:
+    # 在 residence 领地内是否允许无限飞行
+    infinite-fly: true

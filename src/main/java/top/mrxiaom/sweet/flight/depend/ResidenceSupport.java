@@ -35,6 +35,7 @@ public class ResidenceSupport extends AbstractModule implements IFlyChecker {
 
     @Override
     public boolean canInfiniteFly(@NotNull Player player, @NotNull Location loc) {
+        if (!FlightManager.inst().getResidenceInfiniteFly()) return false;
         ClaimedResidence res = ResidenceApi.getResidenceManager().getByLoc(loc);
         if (res != null) {
             ResidencePermissions perm = res.getPermissions();
