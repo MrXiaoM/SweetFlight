@@ -2,7 +2,7 @@ package top.mrxiaom.sweet.flight.depend;
 
 import cn.lunadeer.dominion.api.DominionAPI;
 import cn.lunadeer.dominion.api.dtos.DominionDTO;
-import cn.lunadeer.dominion.api.dtos.GroupDTO;
+import cn.lunadeer.dominion.api.dtos.MemberDTO;
 import cn.lunadeer.dominion.api.dtos.flag.Flags;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -13,6 +13,7 @@ import top.mrxiaom.sweet.flight.api.IFlyChecker;
 import top.mrxiaom.sweet.flight.func.AbstractModule;
 import top.mrxiaom.sweet.flight.func.FlightManager;
 
+import java.util.stream.Collectors;
 /**
  * Dominion 插件的飞行支持模块。
  * <p>
@@ -53,5 +54,17 @@ public class DominionSupport extends AbstractModule implements IFlyChecker {
         }
 
         return dominionAPI.checkPrivilegeFlagSilence(loc, Flags.FLY, player);
+    }
+
+    @Override
+    public boolean canInfiniteFly(@NotNull Player player, @NotNull Location loc) {
+        if (!FlightManager.inst().getDominionInfiniteFly()) return false;
+        DominionDTO dominion = dominionAPI.getDominion(loc);
+        if (dominion != null) {
+            // 检查玩家是否是领地成员或者是领地主人，如果是，返回 true
+            return dominion.getMembers().stream().map(MemberDTO::getPlayerUUID).collect(Collectors.toList()).contains(player.getUniqueId()) ||
+                    dominion.getOwner().equals(player.getUniqueId());
+        }
+        return false;
     }
 }
