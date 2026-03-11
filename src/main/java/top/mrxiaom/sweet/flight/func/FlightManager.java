@@ -189,8 +189,8 @@ public class FlightManager extends AbstractModule implements Listener {
             warn("time-consume-order 中未发现 standard");
         }
 
-        this.dominionInfiniteFly = config.getBoolean("hook.dominion.infinite-fly", true);
-        this.residenceInfiniteFly = config.getBoolean("hook.residence.infinite-fly", true);
+        this.dominionInfiniteFly = config.getBoolean("hook.dominion.infinite-fly", false);
+        this.residenceInfiniteFly = config.getBoolean("hook.residence.infinite-fly", false);
 
         for (Player player : toLoad) {
             if (isEnabledWorld(player.getWorld())) {

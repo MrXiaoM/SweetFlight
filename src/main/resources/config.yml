@@ -54,8 +54,8 @@ boss-bar:
 
 hook:
   dominion:
-    # 在 dominion 领地内是否允许无限飞行
-    infinite-fly: true
+    # 在 Dominion 领地内是否允许无限飞行
+    infinite-fly: false
   residence:
-    # 在 residence 领地内是否允许无限飞行
-    infinite-fly: true
+    # 在 Residence 领地内是否允许无限飞行
+    infinite-fly: false
