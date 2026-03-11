@@ -11,7 +11,7 @@ buildscript {
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.flight"
-version = "1.1.1"
+version = "1.1.2"
 val targetJavaVersion = 8
 val pluginBaseModules = base.modules.run { listOf(library, paper, l10n) }
 val shadowGroup = "top.mrxiaom.sweet.flight.libs"
