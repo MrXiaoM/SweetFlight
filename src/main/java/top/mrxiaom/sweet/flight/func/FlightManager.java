@@ -7,9 +7,12 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -50,6 +53,7 @@ public class FlightManager extends AbstractModule implements Listener {
     private final Set<String> worldBlackList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     private boolean dominionInfiniteFly;
     private boolean residenceInfiniteFly;
+    private boolean disableFlightWhenHurt;
 
     public FlightManager(SweetFlight plugin) {
         super(plugin);
@@ -169,6 +173,8 @@ public class FlightManager extends AbstractModule implements Listener {
                 }
             }
         }
+
+        this.disableFlightWhenHurt = config.getBoolean("disable-flight-when-hurt", false);
 
         this.formatHour = config.getString("time-format.hour", "%d时");
         this.formatHours = config.getString("time-format.hours", "%d时");
@@ -319,6 +325,20 @@ public class FlightManager extends AbstractModule implements Listener {
             }
             FlightDatabase db = plugin.getFlightDatabase();
             db.setPlayer(data);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerHurt(EntityDamageEvent e) {
+        if (!disableFlightWhenHurt || e.isCancelled()) return;
+        Entity entity = e.getEntity();
+        if (entity instanceof Player) {
+            // 玩家受伤取消飞行
+            Player player = (Player) entity;
+            if (player.isFlying() && isGameModeCannotFly(player)) {
+                player.setFlying(false);
+                player.setAllowFlight(false);
+            }
         }
     }
 

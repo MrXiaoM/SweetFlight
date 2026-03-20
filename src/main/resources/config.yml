@@ -24,6 +24,9 @@ worlds:
   # 黑名单世界，不区分大小写
   blacklist: []
 
+# 玩家是否在受到伤害时关闭飞行
+disable-flight-when-hurt: false
+
 time-format:
   hour: '%d时'
   hours: '%d时'
