@@ -95,6 +95,17 @@ public class FlightManager extends AbstractModule implements Listener {
     }
 
     /**
+     * 世界是否处于 <code>config.yml</code> 定义的“指定世界”中，如果玩家有权限 <code>sweet.flight.bypass.world</code>，该方法恒返回 <code>true</code>
+     * @see FlightManager#isEnabledWorld(World)
+     */
+    public boolean isEnabledWorld(Player player) {
+        if (player.hasPermission("sweet.flight.bypass.world")) {
+            return true;
+        }
+        return isEnabledWorld(player.getWorld());
+    }
+
+    /**
      * 世界是否处于 <code>config.yml</code> 定义的“指定世界”中
      * @param worldName 世界名
      */
@@ -199,7 +210,7 @@ public class FlightManager extends AbstractModule implements Listener {
         this.residenceInfiniteFly = config.getBoolean("hook.residence.infinite-fly", false);
 
         for (Player player : toLoad) {
-            if (isEnabledWorld(player.getWorld())) {
+            if (isEnabledWorld(player)) {
                 onJoin(player);
             } else {
                 if (player.isFlying() || player.getAllowFlight()) {
@@ -257,7 +268,7 @@ public class FlightManager extends AbstractModule implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        if (isEnabledWorld(player.getWorld())) {
+        if (isEnabledWorld(player)) {
             plugin.getScheduler().runTask(() -> onJoin(player));
         } else {
             if (player.isFlying() || player.getAllowFlight()) {
@@ -347,7 +358,7 @@ public class FlightManager extends AbstractModule implements Listener {
         Player player = e.getPlayer();
 
         // 如果从 “指定世界” 进入其它世界，关闭玩家飞行
-        if (isEnabledWorld(e.getFrom()) && !isEnabledWorld(player.getWorld())) {
+        if (isEnabledWorld(e.getFrom()) && !isEnabledWorld(player)) {
             Messages.flight__world_not_allow.tm(player);
             player.setFlying(false);
             player.setAllowFlight(false);
@@ -358,8 +369,8 @@ public class FlightManager extends AbstractModule implements Listener {
     public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
         Player player = e.getPlayer();
 
-        if (e.isFlying()) {
-            boolean flag = isEnabledWorld(player.getWorld());
+        if (e.isFlying() && !player.hasPermission("sweet.flight.bypass.world")) {
+            boolean flag = isEnabledWorld(player);
             switch (worldMode) {
                 case HANDLE_ALL:
                     if (!flag) {
@@ -425,7 +436,7 @@ public class FlightManager extends AbstractModule implements Listener {
         GroupManager groups = GroupManager.inst();
         LocalDateTime now = LocalDateTime.now();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            boolean flag = isEnabledWorld(player.getWorld());
+            boolean flag = isEnabledWorld(player);
             switch (worldMode) {
                 case HANDLE_ALL:
                     if (!flag) {
