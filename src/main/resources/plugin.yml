@@ -5,10 +5,10 @@ api-version: 1.13
 softdepend:
   - PlaceholderAPI
   - Residence
+  - Dominion
 authors: [ MrXiaoM ]
 folia-supported: true
-libraries:
-  - "org.jetbrains:annotations:24.0.0"
+# PluginBase Libraries ${libraries_config}
 commands:
   sweetflight:
     description: 'The main command of SweetFlight'
