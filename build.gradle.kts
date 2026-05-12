@@ -1,3 +1,5 @@
+import top.mrxiaom.gradle.LibraryHelper
+
 plugins {
     java
     `maven-publish`
@@ -6,7 +8,7 @@ plugins {
 }
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.17")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.20")
 }
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
@@ -29,14 +31,11 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     compileOnly(base.depend.annotations)
 
-    compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly(files("libs/Residence.jar"))
-    compileOnly("cn.lunadeer:DominionAPI:4.7.3")
+    compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("com.github.Zrips:Residence:6.0.0.1") { isTransitive = false }
+    compileOnly("cn.lunadeer:DominionAPI:4.8.3")
 
-    base.library("net.kyori:adventure-api:4.22.0")
-    base.library("net.kyori:adventure-text-minimessage:4.22.0")
-    base.library("net.kyori:adventure-text-serializer-gson:4.22.0")
-    base.library("net.kyori:adventure-text-serializer-plain:4.22.0")
+    base.library(LibraryHelper.adventure("4.22.0"))
     base.library(base.depend.HikariCP)
 
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
