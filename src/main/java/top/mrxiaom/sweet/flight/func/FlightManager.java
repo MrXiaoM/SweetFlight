@@ -335,8 +335,17 @@ public class FlightManager extends AbstractModule implements Listener {
                 data.bossBar = null;
             }
             FlightDatabase db = plugin.getFlightDatabase();
+            plugin.getScheduler().runTaskAsync(() -> db.setPlayer(data));
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        FlightDatabase db = plugin.getFlightDatabase();
+        for (PlayerData data : players.values()) {
             db.setPlayer(data);
         }
+        players.clear();
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
