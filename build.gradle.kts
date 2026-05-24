@@ -13,7 +13,7 @@ buildscript {
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.flight"
-version = "1.1.2"
+version = "1.1.3"
 val targetJavaVersion = 8
 val pluginBaseModules = base.modules.run { listOf(library, l10n) }
 val shadowGroup = "top.mrxiaom.sweet.flight.libs"
@@ -37,6 +37,7 @@ dependencies {
 
     base.library(LibraryHelper.adventure("4.25.0"))
     base.library(base.depend.HikariCP)
+    base.collectPluginHolders()
 
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
     for (artifact in pluginBaseModules) {
