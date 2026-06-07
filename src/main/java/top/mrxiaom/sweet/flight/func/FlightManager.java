@@ -212,7 +212,7 @@ public class FlightManager extends AbstractModule implements Listener {
         for (Player player : toLoad) {
             if (isEnabledWorld(player)) {
                 onJoin(player);
-            } else {
+            } else if (isGameModeCannotFly(player)) {
                 if (player.isFlying() || player.getAllowFlight()) {
                     Messages.flight__world_not_allow.tm(player);
                     player.setFlying(false);
@@ -270,7 +270,7 @@ public class FlightManager extends AbstractModule implements Listener {
         Player player = e.getPlayer();
         if (isEnabledWorld(player)) {
             plugin.getScheduler().runTask(() -> onJoin(player));
-        } else {
+        } else if (isGameModeCannotFly(player)) {
             if (player.isFlying() || player.getAllowFlight()) {
                 Messages.flight__world_not_allow.tm(player);
                 player.setFlying(false);
@@ -367,7 +367,7 @@ public class FlightManager extends AbstractModule implements Listener {
         Player player = e.getPlayer();
 
         // 如果从 “指定世界” 进入其它世界，关闭玩家飞行
-        if (isEnabledWorld(e.getFrom()) && !isEnabledWorld(player)) {
+        if (isEnabledWorld(e.getFrom()) && !isEnabledWorld(player) && isGameModeCannotFly(player)) {
             Messages.flight__world_not_allow.tm(player);
             player.setFlying(false);
             player.setAllowFlight(false);
@@ -378,7 +378,7 @@ public class FlightManager extends AbstractModule implements Listener {
     public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
         Player player = e.getPlayer();
 
-        if (e.isFlying() && !player.hasPermission("sweet.flight.bypass.world")) {
+        if (e.isFlying() && isGameModeCannotFly(player) && !player.hasPermission("sweet.flight.bypass.world")) {
             boolean flag = isEnabledWorld(player);
             switch (worldMode) {
                 case HANDLE_ALL:
@@ -445,6 +445,7 @@ public class FlightManager extends AbstractModule implements Listener {
         GroupManager groups = GroupManager.inst();
         LocalDateTime now = LocalDateTime.now();
         for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!isGameModeCannotFly(player)) continue;
             boolean flag = isEnabledWorld(player);
             switch (worldMode) {
                 case HANDLE_ALL:
