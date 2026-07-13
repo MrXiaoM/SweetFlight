@@ -12,10 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.player.*;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.AdventureUtil;
@@ -397,7 +394,7 @@ public class FlightManager extends AbstractModule implements Listener {
             }
         }
         int standard = GroupManager.inst().getFlightSeconds(player);
-        PlayerData data = players.get(player.getUniqueId());
+        PlayerData data = get(player);
         if (!e.isFlying()) { // 关闭飞行时移除血条
             if (data != null && data.bossBar != null) {
                 data.bossBar.removeAll();
@@ -466,7 +463,7 @@ public class FlightManager extends AbstractModule implements Listener {
             }
             // 获取玩家的基础飞行时间
             int standard = groups.getFlightSeconds(player);
-            PlayerData data = players.get(player.getUniqueId());
+            PlayerData data = get(player);
             if (data == null) continue;
             if (now.isAfter(data.outdate)) { // 如果数据到期了，重置基础飞行时间，并提交到数据库
                 data.outdate = nextOutdate();
@@ -547,6 +544,7 @@ public class FlightManager extends AbstractModule implements Listener {
      * @param standard 基础飞行时间
      */
     private void updateBossBar(PlayerData data, int standard) {
+        if (data == null) return;
         int current = data.status + data.extra; // 当前剩余的总飞行时间
         // 更新血条进度
         double progress = standard <= 0 ? 1.0 : Math.min(1.0, Math.max(0.0, (double) current / standard));
