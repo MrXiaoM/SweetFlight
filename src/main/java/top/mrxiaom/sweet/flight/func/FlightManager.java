@@ -347,7 +347,7 @@ public class FlightManager extends AbstractModule implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerHurt(EntityDamageEvent e) {
-        if (!disableFlightWhenHurt || e.isCancelled()) return;
+        if (disableFlightWhenHurt || e.isCancelled()) return;
         Entity entity = e.getEntity();
         if (entity instanceof Player) {
             // 玩家受伤取消飞行
