@@ -210,13 +210,23 @@ public class FlightManager extends AbstractModule implements Listener {
                 onJoin(player);
             } else if (isGameModeCannotFly(player)) {
                 if (player.isFlying() || player.getAllowFlight()) {
-                    Messages.flight__world_not_allow.tm(player);
-                    player.setFlying(false);
-                    player.setAllowFlight(false);
+                    toggleOff(player, Messages.flight__world_not_allow);
                 }
             }
         }
         toLoad.clear();
+    }
+
+    private void toggleOff(Player player) {
+        toggleOff(player, null);
+    }
+
+    private void toggleOff(Player player, Messages message) {
+        if (message != null) {
+            message.tm(player);
+        }
+        player.setFlying(false);
+        player.setAllowFlight(false);
     }
 
     /**
@@ -268,9 +278,7 @@ public class FlightManager extends AbstractModule implements Listener {
             plugin.getScheduler().runTask(() -> onJoin(player));
         } else if (isGameModeCannotFly(player)) {
             if (player.isFlying() || player.getAllowFlight()) {
-                Messages.flight__world_not_allow.tm(player);
-                player.setFlying(false);
-                player.setAllowFlight(false);
+                toggleOff(player, Messages.flight__world_not_allow);
             }
         }
     }
@@ -297,8 +305,7 @@ public class FlightManager extends AbstractModule implements Listener {
             Location loc = player.getLocation();
             // 其它插件不允许玩家在此飞行，关闭玩家的飞行
             if (!canPlayerFlyAt(player, loc)) {
-                player.setAllowFlight(false);
-                player.setFlying(false);
+                toggleOff(player);
             } else {
                 if (canInfiniteFly(player, loc)) { // 其它插件允许玩家无限飞行，不进行任何操作
                     return;
@@ -310,8 +317,7 @@ public class FlightManager extends AbstractModule implements Listener {
                         if (standard > 0) {
                             Messages.time_not_enough__join.tm(player);
                         }
-                        player.setFlying(false);
-                        player.setAllowFlight(false);
+                        toggleOff(player);
                     } else { // 如果时间未耗尽，开启飞行
                         player.setAllowFlight(true);
                     }
@@ -353,8 +359,7 @@ public class FlightManager extends AbstractModule implements Listener {
                 // 玩家受伤取消飞行
                 Player player = (Player) entity;
                 if (player.isFlying() && isGameModeCannotFly(player)) {
-                    player.setFlying(false);
-                    player.setAllowFlight(false);
+                    toggleOff(player);
                 }
             }
         }
@@ -366,9 +371,7 @@ public class FlightManager extends AbstractModule implements Listener {
 
         // 如果从 “指定世界” 进入其它世界，关闭玩家飞行
         if (isEnabledWorld(e.getFrom()) && !isEnabledWorld(player) && isGameModeCannotFly(player)) {
-            Messages.flight__world_not_allow.tm(player);
-            player.setFlying(false);
-            player.setAllowFlight(false);
+            toggleOff(player, Messages.flight__world_not_allow);
         }
     }
 
@@ -419,9 +422,7 @@ public class FlightManager extends AbstractModule implements Listener {
                 if (isGameModeCannotFly(player)) {
                     // 如果时间耗尽，且其它插件没有允许玩家在此无限飞行，提醒玩家并关闭飞行
                     if (data.status == 0 && data.extra == 0 && !canInfiniteFly(player, loc)) {
-                        Messages.time_not_enough__start.tm(player);
-                        player.setFlying(false);
-                        player.setAllowFlight(false);
+                        toggleOff(player, Messages.time_not_enough__start);
                         e.setCancelled(true);
                         return;
                     }
@@ -449,9 +450,7 @@ public class FlightManager extends AbstractModule implements Listener {
                 case HANDLE_ALL:
                     if (!flag) {
                         if (player.isFlying() || player.getAllowFlight()) {
-                            Messages.flight__world_not_allow.tm(player);
-                            player.setFlying(false);
-                            player.setAllowFlight(false);
+                            toggleOff(player, Messages.flight__world_not_allow);
                         }
                         continue;
                     }
@@ -479,8 +478,7 @@ public class FlightManager extends AbstractModule implements Listener {
                     if (!canPlayerFlyAt(player, loc)) {
                         update = false;
                         // 关闭飞行，关闭血条
-                        player.setFlying(false);
-                        player.setAllowFlight(false);
+                        toggleOff(player);
                         if (data.bossBar != null) {
                             data.bossBar.removeAll();
                             data.bossBar = null;
@@ -503,9 +501,7 @@ public class FlightManager extends AbstractModule implements Listener {
                         }
                         if (!success) { // 如果时间都不够的话，取消飞行状态
                             update = false;
-                            Messages.time_not_enough__timer.tm(player);
-                            player.setFlying(false);
-                            player.setAllowFlight(false);
+                            toggleOff(player, Messages.time_not_enough__timer);
                             if (data.bossBar != null) {
                                 data.bossBar.removeAll();
                                 data.bossBar = null;
