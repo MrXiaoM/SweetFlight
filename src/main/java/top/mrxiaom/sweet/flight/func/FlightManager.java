@@ -16,7 +16,6 @@ import org.bukkit.event.player.*;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.AdventureUtil;
-import top.mrxiaom.pluginbase.utils.ColorHelper;
 import top.mrxiaom.pluginbase.utils.adventure.serializer.legacy.LegacyComponentSerializer;
 import top.mrxiaom.pluginbase.utils.depend.PAPI;
 import top.mrxiaom.pluginbase.utils.Util;
@@ -50,7 +49,7 @@ public class FlightManager extends AbstractModule implements Listener {
     private final Set<String> worldBlackList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     private boolean dominionInfiniteFly;
     private boolean residenceInfiniteFly;
-    private boolean disableFlightWhenHurt;
+    private boolean funcToggleOffFlightWhenHurt;
 
     public FlightManager(SweetFlight plugin) {
         super(plugin);
@@ -182,7 +181,7 @@ public class FlightManager extends AbstractModule implements Listener {
             }
         }
 
-        this.disableFlightWhenHurt = config.getBoolean("disable-flight-when-hurt", false);
+        this.funcToggleOffFlightWhenHurt = config.getBoolean("disable-flight-when-hurt", false);
 
         this.formatHour = config.getString("time-format.hour", "%d时");
         this.formatHours = config.getString("time-format.hours", "%d时");
@@ -347,14 +346,16 @@ public class FlightManager extends AbstractModule implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerHurt(EntityDamageEvent e) {
-        if (!disableFlightWhenHurt || e.isCancelled()) return;
-        Entity entity = e.getEntity();
-        if (entity instanceof Player) {
-            // 玩家受伤取消飞行
-            Player player = (Player) entity;
-            if (player.isFlying() && isGameModeCannotFly(player)) {
-                player.setFlying(false);
-                player.setAllowFlight(false);
+        if (e.isCancelled()) return;
+        if (funcToggleOffFlightWhenHurt) {
+            Entity entity = e.getEntity();
+            if (entity instanceof Player) {
+                // 玩家受伤取消飞行
+                Player player = (Player) entity;
+                if (player.isFlying() && isGameModeCannotFly(player)) {
+                    player.setFlying(false);
+                    player.setAllowFlight(false);
+                }
             }
         }
     }
