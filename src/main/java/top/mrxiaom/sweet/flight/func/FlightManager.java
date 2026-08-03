@@ -157,10 +157,7 @@ public class FlightManager extends AbstractModule implements Listener {
         if (!bossBarDisplayMode.equals(this.bossBarDisplayMode)) {
             // 如果显示方式发生变动，移除所有人的当前剩余时间显示
             for (PlayerData data : players.values()) {
-                if (data.bossBar != null) {
-                    data.bossBar.removeAll();
-                    data.bossBar = null;
-                }
+                data.removeBossBar();
             }
             shouldUpdateBossBar = true;
         } else if (this.bossBarDisplayMode.equals(EnumDisplayMode.BOSS_BAR)) {
@@ -332,10 +329,7 @@ public class FlightManager extends AbstractModule implements Listener {
     public void onPlayerQuit(PlayerQuitEvent e) {
         PlayerData data = players.remove(e.getPlayer().getUniqueId());
         if (data != null) { // 离开游戏自动上传数据到数据库
-            if (data.bossBar != null) {
-                data.bossBar.removeAll();
-                data.bossBar = null;
-            }
+            data.removeBossBar();
             FlightDatabase db = plugin.getFlightDatabase();
             plugin.getScheduler().runTaskAsync(() -> db.setPlayer(data));
         }
@@ -400,9 +394,8 @@ public class FlightManager extends AbstractModule implements Listener {
         int standard = GroupManager.inst().getFlightSeconds(player);
         PlayerData data = get(player);
         if (!e.isFlying()) { // 关闭飞行时移除血条
-            if (data != null && data.bossBar != null) {
-                data.bossBar.removeAll();
-                data.bossBar = null;
+            if (data != null) {
+                data.removeBossBar();
             }
             return;
         }
@@ -479,10 +472,7 @@ public class FlightManager extends AbstractModule implements Listener {
                         update = false;
                         // 关闭飞行，关闭血条
                         toggleOff(player);
-                        if (data.bossBar != null) {
-                            data.bossBar.removeAll();
-                            data.bossBar = null;
-                        }
+                        data.removeBossBar();
                         // 如果不是无限飞行时间，且其它插件没有允许玩家进行无限飞行
                     } else if (standard >= 0 && !canInfiniteFly(player, loc)) {
                         // 优先扣除额外飞行时间
@@ -502,19 +492,13 @@ public class FlightManager extends AbstractModule implements Listener {
                         if (!success) { // 如果时间都不够的话，取消飞行状态
                             update = false;
                             toggleOff(player, Messages.time_not_enough__timer);
-                            if (data.bossBar != null) {
-                                data.bossBar.removeAll();
-                                data.bossBar = null;
-                            }
+                            data.removeBossBar();
                         }
                     }
                     if (update) updateBossBar(data, standard);
                 } else {
                     // 如果玩家没在飞行，就关掉 BOSS 血条
-                    if (data.bossBar != null) {
-                        data.bossBar.removeAll();
-                        data.bossBar = null;
-                    }
+                    data.removeBossBar();
                 }
                 // 如果存档计数器时间到了，提交数据到数据库
                 if (--data.saveCounter == 0) {

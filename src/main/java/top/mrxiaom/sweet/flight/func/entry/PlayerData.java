@@ -34,4 +34,12 @@ public class PlayerData {
         this.extra = extra;
         this.outdate = outdate;
     }
+
+    public void removeBossBar() {
+        IBarDisplay bossBar = this.bossBar;
+        if (bossBar != null) {
+            bossBar.removeAll();
+            this.bossBar = null;
+        }
+    }
 }

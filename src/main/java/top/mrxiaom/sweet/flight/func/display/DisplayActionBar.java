@@ -1,5 +1,6 @@
 package top.mrxiaom.sweet.flight.func.display;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import top.mrxiaom.pluginbase.utils.AdventureUtil;
 
@@ -8,9 +9,9 @@ import java.util.List;
 
 public class DisplayActionBar implements IBarDisplay {
     private final List<Player> players = new ArrayList<>();
-    private String title;
+    private Component title;
     public DisplayActionBar(String title) {
-        this.title = title;
+        this.title = AdventureUtil.miniMessage(title);
     }
 
     @Override
@@ -33,7 +34,7 @@ public class DisplayActionBar implements IBarDisplay {
 
     @Override
     public void setTitle(String text) {
-        this.title = text;
+        this.title = AdventureUtil.miniMessage(text);
         send();
     }
 
