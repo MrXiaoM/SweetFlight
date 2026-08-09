@@ -90,7 +90,7 @@ Minecraft 限时飞行插件
 
 > 注意！菜单功能为可选项，SweetFlight 本身不依赖任何前置插件，如果你不需要菜单功能，请忽略本部分！
 
-菜单由 [Trmenu](https://taboo.8aka.cn/TrMenu/) 插件提供 (Folia/Paper/Spigot/bukkit)
+菜单由 [Trmenu](https://nitwikit.8aka.org/java/process/plugin/misc/menu/trmenu) 插件提供 (Folia/Paper/Spigot/bukkit)
 
 ![preview](img/menu.png)
 
@@ -104,7 +104,7 @@ Minecraft 限时飞行插件
 
 ### 菜单前置
 
-- [Trmenu](https://taboo.8aka.cn/TrMenu/) 插件
+- [Trmenu](https://nitwikit.8aka.org/java/process/plugin/misc/menu/trmenu) 插件
 - [Vault](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/vault) 或 [ServiceIO(推荐)](https://nitwikit2.8aka.org/Java/process/plugin/Front-Plugin/Vault/ServiceIO) 插件 (仅需一个即可)
 - [XConomy](https://github.com/YiC200333/XConomy) 或其它经济插件 (自行修改扣费命令)
 - [PlaceholderAPI](https://modrinth.com/plugin/placeholderapi) 插件
