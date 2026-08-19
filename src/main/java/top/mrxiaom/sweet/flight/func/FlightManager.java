@@ -50,6 +50,7 @@ public class FlightManager extends AbstractModule implements Listener {
     private boolean dominionInfiniteFly;
     private boolean residenceInfiniteFly;
     private boolean funcToggleOffFlightWhenHurt;
+    private boolean funcAutoEnableFlightOnJoin;
 
     public FlightManager(SweetFlight plugin) {
         super(plugin);
@@ -179,6 +180,7 @@ public class FlightManager extends AbstractModule implements Listener {
         }
 
         this.funcToggleOffFlightWhenHurt = config.getBoolean("disable-flight-when-hurt", false);
+        this.funcAutoEnableFlightOnJoin = config.getBoolean("auto-enable-flight-on-join", true);
 
         this.formatHour = config.getString("time-format.hour", "%d时");
         this.formatHours = config.getString("time-format.hours", "%d时");
@@ -308,7 +310,9 @@ public class FlightManager extends AbstractModule implements Listener {
                     return;
                 }
                 if (standard == -1) { // 无限飞行时间，开启飞行
-                    player.setAllowFlight(true);
+                    if (funcAutoEnableFlightOnJoin) {
+                        player.setAllowFlight(true);
+                    }
                 } else {
                     if (extra == 0 && status == 0) { // 如果时间耗尽，提示并关闭飞行
                         if (standard > 0) {
@@ -316,12 +320,16 @@ public class FlightManager extends AbstractModule implements Listener {
                         }
                         toggleOff(player);
                     } else { // 如果时间未耗尽，开启飞行
-                        player.setAllowFlight(true);
+                        if (funcAutoEnableFlightOnJoin) {
+                            player.setAllowFlight(true);
+                        }
                     }
                 }
             }
         } else {
-            player.setAllowFlight(true);
+            if (funcAutoEnableFlightOnJoin) {
+                player.setAllowFlight(true);
+            }
         }
     }
 

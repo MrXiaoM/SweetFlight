@@ -27,6 +27,9 @@ worlds:
 # 玩家是否在受到伤害时关闭飞行
 disable-flight-when-hurt: false
 
+# 在玩家进入游戏时，如果可以开启飞行，则自动开启飞行
+auto-enable-flight-on-join: true
+
 time-format:
   hour: '%d时'
   hours: '%d时'
