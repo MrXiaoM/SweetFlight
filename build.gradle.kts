@@ -8,7 +8,7 @@ plugins {
 }
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.34")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.8.0")
 }
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
@@ -16,7 +16,7 @@ println("Group:   $group")
 println("Version: $version")
 
 val targetJavaVersion = 8
-val pluginBaseModules = base.modules.run { listOf(library, l10n, misc) }
+val pluginBaseModules = base.modules.run { listOf(library, message, l10n, misc) }
 val shadowGroup = "top.mrxiaom.sweet.flight.libs"
 
 repositories {
