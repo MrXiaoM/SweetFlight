@@ -18,6 +18,8 @@ import top.mrxiaom.sweet.flight.SweetFlight;
 import top.mrxiaom.sweet.flight.func.AbstractModule;
 import top.mrxiaom.sweet.flight.func.FlightManager;
 import top.mrxiaom.sweet.flight.func.GroupManager;
+import top.mrxiaom.sweet.flight.func.entry.ByLocale;
+import top.mrxiaom.sweet.flight.func.entry.EnumMode;
 import top.mrxiaom.sweet.flight.func.entry.Group;
 import top.mrxiaom.sweet.flight.func.entry.PlayerData;
 
@@ -161,26 +163,51 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             List<Group> groups = manager.getGroups(target);
             int standard = 0;
             for (Group group : groups) {
-                if (group.getMode().equals(Group.Mode.ADD)) {
+                if (group.getTimeMode().equals(EnumMode.ADD)) {
                     int value = group.getTimeSecond();
                     Messages.command__check__group_add.tm(sender,
                             Pair.of("%group%", group.getName()),
                             Pair.of("%time%", flight.formatTime(value)));
                     standard += value;
                 }
-                if (group.getMode().equals(Group.Mode.SET)) {
+                if (group.getTimeMode().equals(EnumMode.SET)) {
                     int value = group.getTimeSecond();
                     if (value >= 0) {
                         Messages.command__check__group_set.tm(sender,
                                 Pair.of("%group%", group.getName()),
                                 Pair.of("%time%", flight.formatTime(value)));
                     }
-                    standard = group.getTimeSecond();
+                    standard = value;
                 }
                 if (standard == -1) {
                     Messages.command__check__group_infinite.tm(sender,
                             Pair.of("%group%", group.getName()));
                     break;
+                }
+            }
+            if (standard != -1) {
+                ByLocale locale = manager.getLocale(target);
+                if (locale != null) {
+                    if (locale.getTimeMode().equals(EnumMode.ADD)) {
+                        int value = locale.getTimeSecond();
+                        Messages.command__check__locale_add.tm(sender,
+                                Pair.of("%locale%", locale.getName()),
+                                Pair.of("%time%", flight.formatTime(value)));
+                        standard += value;
+                    }
+                    if (locale.getTimeMode().equals(EnumMode.SET)) {
+                        int value = locale.getTimeSecond();
+                        if (value >= 0) {
+                            Messages.command__check__locale_set.tm(sender,
+                                    Pair.of("%locale%", locale.getName()),
+                                    Pair.of("%time%", flight.formatTime(value)));
+                        }
+                        standard = value;
+                    }
+                    if (standard == -1) {
+                        Messages.command__check__locale_infinite.tm(sender,
+                                Pair.of("%locale%", locale.getName()));
+                    }
                 }
             }
             int statusRemain = standard < 0 ? 0 : (standard - data.status);
