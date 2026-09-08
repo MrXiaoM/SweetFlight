@@ -37,7 +37,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (standard == -1) {
                 player.setAllowFlight(true);
             } else {
-                if (data.extra == 0 && data.status == 0) {
+                if (data.extra == 0 && data.status >= standard) {
                     player.setFlying(false);
                     player.setAllowFlight(false);
                 } else {
@@ -100,7 +100,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 if (data == null) {
                     return Messages.player__data_not_found.tm(sender);
                 }
-                if (data.extra == 0 && data.status == 0) {
+                if (data.extra == 0 && data.status >= standard) {
                     target.setFlying(false);
                     target.setAllowFlight(false);
                     return Messages.time_not_enough__command.tm(sender);
@@ -160,8 +160,6 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             }
             List<Group> groups = manager.getGroups(target);
             int standard = 0;
-            int status = data.status;
-            int extra = data.extra;
             for (Group group : groups) {
                 if (group.getMode().equals(Group.Mode.ADD)) {
                     int value = group.getTimeSecond();
@@ -185,10 +183,12 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                     break;
                 }
             }
+            int statusRemain = standard < 0 ? 0 : (standard - data.status);
+            int extra = data.extra;
             Messages.command__check__standard.tm(sender, Pair.of("%time%", flight.formatTimeMax(standard)));
-            String remaining = flight.formatTime(status + extra);
+            String remaining = flight.formatTime(statusRemain + extra);
             Messages.command__check__remaining.tm(sender, Pair.of("%time%", standard < 0 ? flight.getFormatInfinite() : remaining), Pair.of("%time_real%", remaining));
-            Messages.command__check__remaining_status.tm(sender, Pair.of("%time%", flight.formatTime(status)));
+            Messages.command__check__remaining_status.tm(sender, Pair.of("%time%", flight.formatTime(statusRemain)));
             Messages.command__check__remaining_extra.tm(sender, Pair.of("%time%", flight.formatTime(extra)));
             return true;
         }
@@ -244,13 +244,13 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             GroupManager groups = GroupManager.inst();
             PlayerData data = manager.getOrCreate(player);
             int standard = groups.getFlightSeconds(player);
-            data.status = Math.max(0, standard);
+            data.status = 0;
             data.outdate = manager.nextOutdate();
             plugin.getFlightDatabase().setPlayer(data);
             postSetFlightTime(data);
             return Messages.command__reset__success.tm(sender,
                     Pair.of("%player%", player.getName()),
-                    Pair.of("%time%", manager.formatTime(data.status)));
+                    Pair.of("%time%", standard < 0 ? manager.getFormatInfinite() : manager.formatTime(standard)));
         }
         if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]) && sender.isOp()) {
             if (args.length == 2 && "database".equalsIgnoreCase(args[1])) {

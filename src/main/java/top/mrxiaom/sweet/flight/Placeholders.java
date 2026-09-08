@@ -57,13 +57,15 @@ public class Placeholders extends PlaceholderExpansion {
             FlightManager manager = FlightManager.inst();
             PlayerData data = manager.get(player);
             if (data == null) return "0s";
-            return manager.formatTime(data.status);
+            int standard = GroupManager.inst().getFlightSeconds(player);
+            return standard < 0 ? manager.getFormatInfinite() : manager.formatTime(standard - data.status);
         }
         if (params.equalsIgnoreCase("time")) {
             FlightManager manager = FlightManager.inst();
             PlayerData data = manager.get(player);
             if (data == null) return "0s";
-            return manager.formatTime(data.status + data.extra);
+            int standard = GroupManager.inst().getFlightSeconds(player);
+            return standard < 0 ? manager.getFormatInfinite() : manager.formatTime((standard - data.status) + data.extra);
         }
         if (params.equalsIgnoreCase("extra_time_seconds")) {
             FlightManager manager = FlightManager.inst();
@@ -75,13 +77,15 @@ public class Placeholders extends PlaceholderExpansion {
             FlightManager manager = FlightManager.inst();
             PlayerData data = manager.get(player);
             if (data == null) return "0";
-            return String.valueOf(data.status);
+            int standard = GroupManager.inst().getFlightSeconds(player);
+            return standard < 0 ? "0" : String.valueOf(standard - data.status);
         }
         if (params.equalsIgnoreCase("time_seconds")) {
             FlightManager manager = FlightManager.inst();
             PlayerData data = manager.get(player);
-            if (data == null) return "0s";
-            return String.valueOf(data.status + data.extra);
+            if (data == null) return "0";
+            int standard = GroupManager.inst().getFlightSeconds(player);
+            return standard < 0 ? "0" : manager.formatTime((standard - data.status) + data.extra);
         }
         return super.onPlaceholderRequest(player, params);
     }

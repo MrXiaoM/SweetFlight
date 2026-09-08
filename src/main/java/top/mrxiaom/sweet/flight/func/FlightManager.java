@@ -291,14 +291,15 @@ public class FlightManager extends AbstractModule implements Listener {
         try (Connection conn = plugin.getConnection()) { // 拉取玩家数据
             FlightDatabase db = plugin.getFlightDatabase();
             Integer statusRaw = db.getPlayerStatus(conn, id);
-            // 剩余基础飞行时间
-            status = statusRaw == null ? standard : statusRaw;
+            // 已使用的基础飞行时间
+            status = statusRaw == null ? 0 : statusRaw;
             // 剩余额外飞行时间
             extra = db.getPlayerExtra(conn, id);
             players.put(uuid, new PlayerData(player, status, extra, nextOutdate));
         } catch (SQLException ex) {
             warn(ex);
-            status = extra = 0;
+            status = standard == -1 ? 0 : standard;
+            extra = 0;
         }
         if (!player.hasPermission("sweet.flight.bypass")) {
             Location loc = player.getLocation();
@@ -314,7 +315,7 @@ public class FlightManager extends AbstractModule implements Listener {
                         player.setAllowFlight(true);
                     }
                 } else {
-                    if (extra == 0 && status == 0) { // 如果时间耗尽，提示并关闭飞行
+                    if (extra == 0 && status >= standard) { // 如果时间耗尽，提示并关闭飞行
                         if (standard > 0) {
                             Messages.time_not_enough__join.tm(player);
                         }
@@ -422,7 +423,7 @@ public class FlightManager extends AbstractModule implements Listener {
                 }
                 if (isGameModeCannotFly(player)) {
                     // 如果时间耗尽，且其它插件没有允许玩家在此无限飞行，提醒玩家并关闭飞行
-                    if (data.status == 0 && data.extra == 0 && !canInfiniteFly(player, loc)) {
+                    if (data.status >= standard && data.extra == 0 && !canInfiniteFly(player, loc)) {
                         toggleOff(player, Messages.time_not_enough__start);
                         e.setCancelled(true);
                         return;
@@ -468,7 +469,7 @@ public class FlightManager extends AbstractModule implements Listener {
             if (data == null) continue;
             if (now.isAfter(data.outdate)) { // 如果数据到期了，重置基础飞行时间，并提交到数据库
                 data.outdate = nextOutdate();
-                data.status = Math.max(0, standard);
+                data.status = 0;
                 db.setPlayerStatus(player, data.status, data.outdate);
             } else {
                 // 如果玩家正在飞行
@@ -491,8 +492,8 @@ public class FlightManager extends AbstractModule implements Listener {
                                 success = true;
                                 break;
                             }
-                            if ("standard".equals(order) && data.status > 0) {
-                                data.status--;
+                            if ("standard".equals(order) && data.status < standard) {
+                                data.status++;
                                 success = true;
                                 break;
                             }
@@ -534,7 +535,8 @@ public class FlightManager extends AbstractModule implements Listener {
      */
     private void updateBossBar(PlayerData data, int standard) {
         if (data == null) return;
-        int current = data.status + data.extra; // 当前剩余的总飞行时间
+        int statusRemain = standard < 0 ? 0 : (standard - data.status);
+        int current = statusRemain + data.extra; // 当前剩余的总飞行时间
         // 更新血条进度
         double progress = standard <= 0 ? 1.0 : Math.min(1.0, Math.max(0.0, (double) current / standard));
         // 更新血条标题

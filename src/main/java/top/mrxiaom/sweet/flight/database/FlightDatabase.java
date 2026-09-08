@@ -18,7 +18,7 @@ public class FlightDatabase extends AbstractPluginHolder implements IDatabase {
     }
     @Override
     public void reload(Connection conn, String prefix) throws SQLException {
-        STATUS_TABLE_NAME = (prefix + "status").toUpperCase();
+        STATUS_TABLE_NAME = (prefix + "status_values").toUpperCase();
         EXTRA_TABLE_NAME = (prefix + "extra").toUpperCase();
         try (PreparedStatement ps = conn.prepareStatement(
                 "CREATE TABLE if NOT EXISTS `" + STATUS_TABLE_NAME + "`(" +
