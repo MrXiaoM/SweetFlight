@@ -8,7 +8,7 @@ plugins {
 }
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.8.0")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.8.1")
 }
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
@@ -34,7 +34,7 @@ dependencies {
 
     compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("com.github.Zrips:Residence:6.0.0.1") { isTransitive = false }
-    compileOnly("cn.lunadeer:DominionAPI:4.8.3")
+    compileOnly("cn.lunadeer:DominionAPI:4.9.4")
 
     base.library(LibraryHelper.adventure("4.25.0"))
     base.library(base.depend.HikariCP)
