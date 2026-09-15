@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -441,6 +442,11 @@ public class FlightManager extends AbstractModule implements Listener {
         return gameMode.equals(GameMode.SURVIVAL) || gameMode.equals(GameMode.ADVENTURE);
     }
 
+    private boolean isInVehicle(Player player) {
+        Entity vehicle = player.getVehicle();
+        return vehicle != null;
+    }
+
     private void everySecond() {
         FlightDatabase db = plugin.getFlightDatabase();
         GroupManager groups = GroupManager.inst();
@@ -482,29 +488,17 @@ public class FlightManager extends AbstractModule implements Listener {
                         // 关闭飞行，关闭血条
                         toggleOff(player);
                         data.removeBossBar();
-                        // 如果不是无限飞行时间，且其它插件没有允许玩家进行无限飞行
                     } else if (standard >= 0 && !canInfiniteFly(player, loc)) {
-                        // 优先扣除额外飞行时间
-                        boolean success = false;
-                        for (String order : timeConsumeOrder) {
-                            if ("extra".equals(order) && data.extra > 0) {
-                                data.extra--;
-                                success = true;
-                                break;
-                            }
-                            if ("standard".equals(order) && data.status < standard) {
-                                data.status++;
-                                success = true;
-                                break;
-                            }
-                        }
-                        if (!success) { // 如果时间都不够的话，取消飞行状态
+                        // 如果不是无限飞行时间，且其它插件没有允许玩家进行无限飞行，执行扣除飞行时间
+                        if (isInVehicle(player)) {
                             update = false;
-                            toggleOff(player, Messages.time_not_enough__timer);
-                            data.removeBossBar();
+                        } else {
+                            update = handleTakeTime(player, data, standard);
                         }
                     }
-                    if (update) updateBossBar(data, standard);
+                    if (update) {
+                        updateBossBar(data, standard);
+                    }
                 } else {
                     // 如果玩家没在飞行，就关掉 BOSS 血条
                     data.removeBossBar();
@@ -516,6 +510,29 @@ public class FlightManager extends AbstractModule implements Listener {
                 }
             }
         }
+    }
+
+    private boolean handleTakeTime(Player player, PlayerData data, int standard) {
+        // 优先扣除额外飞行时间
+        boolean success = false;
+        for (String order : timeConsumeOrder) {
+            if ("extra".equals(order) && data.extra > 0) {
+                data.extra--;
+                success = true;
+                break;
+            }
+            if ("standard".equals(order) && data.status < standard) {
+                data.status++;
+                success = true;
+                break;
+            }
+        }
+        if (!success) { // 如果时间都不够的话，取消飞行状态
+            toggleOff(player, Messages.time_not_enough__timer);
+            data.removeBossBar();
+            return false;
+        }
+        return true;
     }
 
     private IBarDisplay createBar(String title) {
