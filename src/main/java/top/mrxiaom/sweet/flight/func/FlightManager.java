@@ -206,13 +206,7 @@ public class FlightManager extends AbstractModule implements Listener {
         this.residenceInfiniteFly = config.getBoolean("hook.residence.infinite-fly", false);
 
         for (Player player : toLoad) {
-            if (isEnabledWorld(player)) {
-                onJoin(player);
-            } else if (isGameModeCannotFly(player)) {
-                if (player.isFlying() || player.getAllowFlight()) {
-                    toggleOff(player, Messages.flight__world_not_allow);
-                }
-            }
+            loadPlayerData(player);
         }
         toLoad.clear();
     }
@@ -273,10 +267,13 @@ public class FlightManager extends AbstractModule implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        Player player = e.getPlayer();
-        if (isEnabledWorld(player)) {
-            plugin.getScheduler().runTask(() -> onJoin(player));
-        } else if (isGameModeCannotFly(player)) {
+        loadPlayerData(e.getPlayer());
+    }
+
+    private void loadPlayerData(Player player) {
+        boolean isInEnabledWorld = isEnabledWorld(player);
+        plugin.getScheduler().runTaskAsync(() -> onJoin(player, isInEnabledWorld));
+        if (!isInEnabledWorld && isGameModeCannotFly(player)) {
             if (player.isFlying() || player.getAllowFlight()) {
                 toggleOff(player, Messages.flight__world_not_allow);
             }
@@ -284,6 +281,10 @@ public class FlightManager extends AbstractModule implements Listener {
     }
 
     public void onJoin(Player player) {
+        onJoin(player, true);
+    }
+
+    public void onJoin(Player player, boolean toggleFlight) {
         int standard = GroupManager.inst().getFlightSeconds(player);
         UUID uuid = player.getUniqueId();
         String id = plugin.key(player);
@@ -302,37 +303,45 @@ public class FlightManager extends AbstractModule implements Listener {
             status = standard == -1 ? 0 : standard;
             extra = 0;
         }
-        if (!player.hasPermission("sweet.flight.bypass")) {
-            Location loc = player.getLocation();
-            // 其它插件不允许玩家在此飞行，关闭玩家的飞行
-            if (!canPlayerFlyAt(player, loc)) {
-                toggleOff(player);
-            } else {
-                if (canInfiniteFly(player, loc)) { // 其它插件允许玩家无限飞行，不进行任何操作
-                    return;
-                }
-                if (standard == -1) { // 无限飞行时间，开启飞行
-                    if (funcAutoEnableFlightOnJoin) {
-                        player.setAllowFlight(true);
-                    }
+        if (toggleFlight) {
+            checkAndToggleFlight(player, standard, status, extra);
+        }
+    }
+
+    private void checkAndToggleFlight(Player player, int standard, int status, int extra) {
+        plugin.getScheduler().runTask(() -> {
+            if (!player.hasPermission("sweet.flight.bypass")) {
+                Location loc = player.getLocation();
+                // 其它插件不允许玩家在此飞行，关闭玩家的飞行
+                if (!canPlayerFlyAt(player, loc)) {
+                    toggleOff(player);
                 } else {
-                    if (extra == 0 && status >= standard) { // 如果时间耗尽，提示并关闭飞行
-                        if (standard > 0) {
-                            Messages.time_not_enough__join.tm(player);
-                        }
-                        toggleOff(player);
-                    } else { // 如果时间未耗尽，开启飞行
+                    if (canInfiniteFly(player, loc)) { // 其它插件允许玩家无限飞行，不进行任何操作
+                        return;
+                    }
+                    if (standard == -1) { // 无限飞行时间，开启飞行
                         if (funcAutoEnableFlightOnJoin) {
                             player.setAllowFlight(true);
                         }
+                    } else {
+                        if (extra == 0 && status >= standard) { // 如果时间耗尽，提示并关闭飞行
+                            if (standard > 0) {
+                                Messages.time_not_enough__join.tm(player);
+                            }
+                            toggleOff(player);
+                        } else { // 如果时间未耗尽，开启飞行
+                            if (funcAutoEnableFlightOnJoin) {
+                                player.setAllowFlight(true);
+                            }
+                        }
                     }
                 }
+            } else {
+                if (funcAutoEnableFlightOnJoin) {
+                    player.setAllowFlight(true);
+                }
             }
-        } else {
-            if (funcAutoEnableFlightOnJoin) {
-                player.setAllowFlight(true);
-            }
-        }
+        });
     }
 
     @EventHandler
